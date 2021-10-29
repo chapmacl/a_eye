@@ -15,7 +15,7 @@ dependencies:
   cupertino_icons:
     ^1.0.2
     
-  camera: 
+  camera: 0.8.1+7
   image: ^3.0.2
   intl: ^0.17.0
   bottom_navy_bar: ^6.0.0
