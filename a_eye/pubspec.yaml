@@ -14,39 +14,39 @@ dependencies:
 
   cupertino_icons:
     ^1.0.2
-    
+  
+  anim_search_bar: ^2.0.2
+  auto_size_text: ^3.0.0
+  back_button_interceptor: ^5.0.0
+  bottom_navy_bar: ^6.0.0
+  cached_network_image: ^3.0.0
   camera:
+  cloud_firestore: ^2.5.3
+  device_info_plus: ^3.1.0
+  draggable_scrollbar: ^0.1.0
+  easy_localization: ^3.0.0
+  firebase_auth: ^3.1.2
+  firebase_core: ^1.7.0
+  firebase_storage: ^10.0.5
+  flutter_ffmpeg: ^0.4.0
+  flutter_settings_screens: ^0.2.2+1
+  flutter_spinkit: ^5.0.0
+  fluttertoast: ^8.0.8
+  focused_menu: ^1.0.5
+  google_sign_in: ^5.0.4
+  image_downloader: ^0.30.0
   image: ^3.0.2
   intl: ^0.17.0
-  bottom_navy_bar: ^6.0.0
-  easy_localization: ^3.0.0
-  wakelock: ^0.5.1
-  photo_view: ^0.13.0
-  google_sign_in: ^5.0.4
-  firebase_core: ^1.7.0
-  firebase_auth: ^3.1.2
-  firebase_storage: ^10.0.5
-  cloud_firestore: ^2.5.3
-  tflite: ^1.1.2
+  ndialog: ^4.1.0
   path_provider: ^2.0.1
-  flutter_spinkit: ^5.0.0
-  back_button_interceptor: ^5.0.0
-  focused_menu: ^1.0.5
+  photo_view: ^0.13.0
+  permission_handler: ^8.2.5
+  sensors_plus: ^1.0.2
   share_plus: ^3.0.1
   sliding_up_panel: ^2.0.0+1
-  ndialog: ^4.1.0
-  flutter_settings_screens: ^0.2.2+1
-  sensors_plus: ^1.0.2
-  flutter_ffmpeg: ^0.4.0
-  anim_search_bar: ^2.0.2
+  tflite: ^1.1.2
   video_player: ^2.1.4
-  auto_size_text: ^3.0.0
-  device_info_plus: ^3.1.0
-  cached_network_image: ^3.0.0
-  image_downloader: ^0.30.0
-  draggable_scrollbar: ^0.1.0
-  fluttertoast: ^8.0.8
-  
+  wakelock: ^0.5.1
 
 
 dev_dependencies:
