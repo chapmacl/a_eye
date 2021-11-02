@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:a_eye/app_theme.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:path/path.dart' as path;
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -17,39 +18,40 @@ class Backend {
   static GoogleSignInAccount googleSignInAccount;
   static User user = auth.currentUser;
 
-  static SnackBar customSnackBar({String content}) {
-    return SnackBar(
-      backgroundColor: Colors.transparent,
-      elevation: 0,
-      content: Container(
-          padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: AppTheme.notWhite,
-            border: Border.all(color: AppTheme.appIndigo, width: 1),
-            boxShadow: const [
-              BoxShadow(
-                color: Color(0x19000000),
-                spreadRadius: 2.0,
-                blurRadius: 8.0,
-                offset: Offset(2, 4),
-              )
-            ],
-            borderRadius: BorderRadius.circular(4),
-          ),
-          child: Row(
-            children: [
-              Padding(
-                padding: EdgeInsets.only(left: 8.0),
-                child: Text(
-                  content,
-                  style: AppTheme.title,
-                  textAlign: TextAlign.center,
-                ),
-              ),
-            ],
-          )),
-    );
-  }
+  // TODO remove
+  // static SnackBar customSnackBar({String content}) {
+  //   return SnackBar(
+  //     backgroundColor: Colors.transparent,
+  //     elevation: 0,
+  //     content: Container(
+  //         padding: const EdgeInsets.all(8),
+  //         decoration: BoxDecoration(
+  //           color: AppTheme.notWhite,
+  //           border: Border.all(color: AppTheme.appIndigo, width: 1),
+  //           boxShadow: const [
+  //             BoxShadow(
+  //               color: Color(0x19000000),
+  //               spreadRadius: 2.0,
+  //               blurRadius: 8.0,
+  //               offset: Offset(2, 4),
+  //             )
+  //           ],
+  //           borderRadius: BorderRadius.circular(4),
+  //         ),
+  //         child: Row(
+  //           children: [
+  //             Padding(
+  //               padding: EdgeInsets.only(left: 8.0),
+  //               child: Text(
+  //                 content,
+  //                 style: AppTheme.title,
+  //                 textAlign: TextAlign.center,
+  //               ),
+  //             ),
+  //           ],
+  //         )),
+  //   );
+  // }
 
   static Future<FirebaseApp> initializeFirebase({
     BuildContext context,
@@ -83,24 +85,33 @@ class Backend {
         user = userCredential.user;
       } on FirebaseAuthException catch (e) {
         if (e.code == 'account-exists-with-different-credential') {
-          ScaffoldMessenger.of(context).showSnackBar(
-            Backend.customSnackBar(
-              content: 'The account already exists with a different credential',
-            ),
-          );
+          Fluttertoast.showToast(
+              msg: "The account already exists with a different credential",
+              toastLength: Toast.LENGTH_SHORT,
+              gravity: ToastGravity.CENTER,
+              timeInSecForIosWeb: 1,
+              backgroundColor: AppTheme.notWhite,
+              textColor: AppTheme.appIndigo,
+              fontSize: 16.0);
         } else if (e.code == 'invalid-credential') {
-          ScaffoldMessenger.of(context).showSnackBar(
-            Backend.customSnackBar(
-              content: 'Error occurred while accessing credentials. Try again.',
-            ),
-          );
+          Fluttertoast.showToast(
+              msg: "Error occurred while accessing credentials. Try again.",
+              toastLength: Toast.LENGTH_SHORT,
+              gravity: ToastGravity.CENTER,
+              timeInSecForIosWeb: 1,
+              backgroundColor: AppTheme.notWhite,
+              textColor: AppTheme.appIndigo,
+              fontSize: 16.0);
         }
       } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          Backend.customSnackBar(
-            content: 'Error occurred using Google Sign In. Try again.',
-          ),
-        );
+        Fluttertoast.showToast(
+            msg: "Error occurred using Google Sign In. Try again.",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.CENTER,
+            timeInSecForIosWeb: 1,
+            backgroundColor: AppTheme.notWhite,
+            textColor: AppTheme.appIndigo,
+            fontSize: 16.0);
       }
     }
     // TODO function to check for number of folders in firebase. If it is over the
@@ -119,11 +130,14 @@ class Backend {
       user = auth.currentUser;
       googleSignInAccount = null;
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        Backend.customSnackBar(
-          content: 'Error signing out. Try again.',
-        ),
-      );
+      Fluttertoast.showToast(
+          msg: "Error signing out. Try again.",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.CENTER,
+          timeInSecForIosWeb: 1,
+          backgroundColor: AppTheme.notWhite,
+          textColor: AppTheme.appIndigo,
+          fontSize: 16.0);
     }
   }
 
