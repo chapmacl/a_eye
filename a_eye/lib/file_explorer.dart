@@ -11,6 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_ffmpeg/flutter_ffmpeg.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:focused_menu/focused_menu.dart';
 import 'package:focused_menu/modals.dart';
 import 'package:image_downloader/image_downloader.dart';
@@ -328,10 +329,14 @@ class _FileScreenState extends State<FileScreen> {
                                     .toList(growable: false);
                                 if (imagePaths.isNotEmpty) {
                                   // get root dir id
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                      Backend.customSnackBar(
-                                          content:
-                                              "Files are being uploaded..."));
+                                  Fluttertoast.showToast(
+                                      msg: "Files are being uploaded...",
+                                      toastLength: Toast.LENGTH_SHORT,
+                                      gravity: ToastGravity.CENTER,
+                                      timeInSecForIosWeb: 1,
+                                      backgroundColor: AppTheme.notWhite,
+                                      textColor: AppTheme.appIndigo,
+                                      fontSize: 16.0);
                                 }
                                 // loop the list and upload each file
                                 for (var path in imagePaths) {
@@ -670,9 +675,15 @@ class _FileScreenState extends State<FileScreen> {
                                     title: Text("Download"),
                                     trailingIcon: Icon(Icons.download_rounded),
                                     onPressed: () async {
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(Backend.customSnackBar(
-                                              content: "Downloading..."));
+                                      Fluttertoast.showToast(
+                                          msg: "Downloading...",
+                                          toastLength: Toast.LENGTH_SHORT,
+                                          gravity: ToastGravity.CENTER,
+                                          timeInSecForIosWeb: 1,
+                                          backgroundColor: AppTheme.notWhite,
+                                          textColor: AppTheme.appIndigo,
+                                          fontSize: 16.0);
+
                                       if (directory[index].endsWith('.jpg') ||
                                           directory[index].endsWith('.mp4')) {
                                         await ImageDownloader.downloadImage(

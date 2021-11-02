@@ -15,15 +15,13 @@ dependencies:
   cupertino_icons:
     ^1.0.2
     
-  camera: 0.8.1+7
+  camera:
   image: ^3.0.2
   intl: ^0.17.0
   bottom_navy_bar: ^6.0.0
   easy_localization: ^3.0.0
   wakelock: ^0.5.1
   photo_view: ^0.13.0
-  googleapis: ^6.0.0
-  googleapis_auth: ^1.1.0
   google_sign_in: ^5.0.4
   firebase_core: ^1.7.0
   firebase_auth: ^3.1.2
@@ -47,6 +45,7 @@ dependencies:
   cached_network_image: ^3.0.0
   image_downloader: ^0.30.0
   draggable_scrollbar: ^0.1.0
+  fluttertoast: ^8.0.8
   
 
 
