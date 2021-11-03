@@ -132,7 +132,7 @@ class _CameraScreenState extends State<CameraScreen>
         isDraggable: !_model,
         controller: _pc,
         minHeight: 40,
-        maxHeight: MediaQuery.of(context).size.height * 0.6,
+        maxHeight: MediaQuery.of(context).size.height * 0.75,
         header: GestureDetector(
           onTap: () {
             if (!_model) {
