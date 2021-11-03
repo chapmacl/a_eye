@@ -10,6 +10,7 @@ import 'package:flutter_settings_screens/flutter_settings_screens.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:tflite/tflite.dart';
 import 'dart:math' as math;
 import 'package:image/image.dart' as imglib;
@@ -55,6 +56,7 @@ class _CameraState extends State<Camera> {
   int imageCount;
   Map labelsMap;
   String encodedMap = Settings.getValue('labelsmap', 'default');
+  bool permission;
 
   @override
   void initState() {
@@ -67,7 +69,7 @@ class _CameraState extends State<Camera> {
       labelsMap = json.decode(encodedMap);
     }
     Future.delayed(Duration(seconds: 1), () {
-      initCameras();
+      initialize();
     });
   }
 
@@ -79,7 +81,8 @@ class _CameraState extends State<Camera> {
 
   @override
   Widget build(BuildContext context) {
-    if (controller == null || !controller.value.isInitialized) {
+    if ((controller == null || !controller.value.isInitialized) &&
+        permission == null) {
       return Column(
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -97,36 +100,82 @@ class _CameraState extends State<Camera> {
           )
         ],
       );
-    }
-
-    var tmp = MediaQuery.of(context).size;
-    var screenH = math.max(tmp.height, tmp.width);
-    var screenW = math.min(tmp.height, tmp.width);
-    tmp = controller.value.previewSize;
-    var previewH = math.max(tmp.height, tmp.width);
-    var previewW = math.min(tmp.height, tmp.width);
-    var screenRatio = screenH / screenW;
-    var previewRatio = previewH / previewW;
-    controller.setZoomLevel(widget.zoom);
-
-    return OverflowBox(
-      maxHeight:
-          screenRatio > previewRatio ? screenH : screenW / previewW * previewH,
-      maxWidth:
-          screenRatio > previewRatio ? screenH / previewH * previewW : screenW,
-      child: widget.blackout
-          ? Container(
-              color: Colors.black,
-            )
-          : CameraPreview(
-              controller,
+    } else if (permission == false) {
+      return Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Icon(Icons.error_outline_rounded),
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Center(
+              child: Text(
+                'Camera permission must be enabled.',
+                style: AppTheme.title2,
+                textAlign: TextAlign.center,
+              ),
             ),
-    );
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              primary: AppTheme.notWhite, // background
+              onPrimary: AppTheme.appIndigo, // foreground
+            ),
+            onPressed: () async {
+              Permission.camera.status.then((value) => print(value));
+              var answer = await Permission.camera.request();
+              if (answer == PermissionStatus.granted) {
+                permission = true;
+                await initCameras();
+              } else if (answer == PermissionStatus.permanentlyDenied) {
+                openAppSettings();
+              }
+            },
+            child: Text('Tap to enable'),
+          )
+        ],
+      );
+    } else if (permission = true && controller != null) {
+      var tmp = MediaQuery.of(context).size;
+      var screenH = math.max(tmp.height, tmp.width);
+      var screenW = math.min(tmp.height, tmp.width);
+      tmp = controller.value.previewSize;
+      var previewH = math.max(tmp.height, tmp.width);
+      var previewW = math.min(tmp.height, tmp.width);
+      var screenRatio = screenH / screenW;
+      var previewRatio = previewH / previewW;
+      controller.setZoomLevel(widget.zoom);
+
+      return OverflowBox(
+        maxHeight: screenRatio > previewRatio
+            ? screenH
+            : screenW / previewW * previewH,
+        maxWidth: screenRatio > previewRatio
+            ? screenH / previewH * previewW
+            : screenW,
+        child: widget.blackout
+            ? Container(
+                color: Colors.black,
+              )
+            : CameraPreview(
+                controller,
+              ),
+      );
+    } else {
+      return Container();
+    }
+  }
+
+  void initialize() async {
+    permission = await Permission.camera.status.isGranted;
+    initCameras();
   }
 
   void initCameras() async {
     if (widget.cameras == null || widget.cameras.length < 1) {
       print('No camera is found');
+    } else if (permission == false) {
+      setState(() {});
     } else {
       controller = new CameraController(
           widget.cameras[0], ResolutionPreset.high,
