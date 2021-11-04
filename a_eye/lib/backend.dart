@@ -9,6 +9,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:http/http.dart' as http;
+import 'package:flutter_settings_screens/flutter_settings_screens.dart'
+    as settings;
 
 class Backend {
   static FirebaseAuth auth = FirebaseAuth.instance;
@@ -79,8 +81,7 @@ class Backend {
             fontSize: 16.0);
       }
     }
-    // TODO function to check for number of folders in firebase. If it is over the
-    // threshold (eg. 5), disable cloud upload.
+    updateFolderCount();
     return user;
   }
 
@@ -154,6 +155,7 @@ class Backend {
       'urls': {path.basename(file.absolute.path): url}
     }, SetOptions(merge: true));
     print('uploaded file ' + file.path);
+    updateFolderCount();
   }
 
   static Future deleteFile(var path) async {
@@ -184,6 +186,14 @@ class Backend {
       }
       await photo.delete();
     }
+    updateFolderCount();
+  }
+
+  static Future updateFolderCount() async {
+    //if (user is not premium)... maybe? I mean, if the user is premium we don't care how many folder they have...
+    //plus, this value can be updated at any time and only really matters to free users.
+    var folders = await getFolders();
+    await settings.Settings.setValue('folders', folders.length);
   }
 }
 

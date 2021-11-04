@@ -130,15 +130,42 @@ class _MyHomePageState extends State<MyHomePage> {
                             }
                           }
                           if (permissions) {
-                            await Settings.setValue('newuser', false);
-                            setState(() {
-                              newUser = false;
-                            });
+                            _pageController.animateToPage(1,
+                                curve: Curves.easeOut,
+                                duration: Duration(milliseconds: 250));
                           }
                         },
                       )
                     ],
                   )),
+                  Container(
+                      child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Image.asset('assets/images/charts.gif'),
+                      Padding(
+                        padding: const EdgeInsets.only(
+                            left: 16.0, right: 16.0, bottom: 16.0),
+                        child: Text(
+                          'Done. \n You\'re all ready to start using A.Eye. smart camera. '
+                          'It\'s completely free to use locally, and you can upload and store up to 5 captured events in our Cloud. '
+                          'The Cloud lets you view captured photos and videos on any device. '
+                          'Unlimited Cloud storage is available to subscribers.',
+                          textAlign: TextAlign.center,
+                          style: AppTheme.title,
+                        ),
+                      ),
+                      ElevatedButton(
+                        child: Text('Let\'s go!'),
+                        onPressed: () async {
+                          await Settings.setValue('newuser', false);
+                          setState(() {
+                            newUser = false;
+                          });
+                        },
+                      )
+                    ],
+                  ))
                 ]
               : [
                   FileScreen(_pageController),

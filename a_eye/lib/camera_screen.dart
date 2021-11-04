@@ -38,7 +38,7 @@ class _CameraScreenState extends State<CameraScreen>
   bool blackout = Settings.getValue('blackout', false);
   bool bbox = Settings.getValue('bbox', true);
   bool labels = Settings.getValue('labels', true);
-
+  int folderCount;
   double zoom = Settings.getValue('zoom', 1.0);
   bool isDetecting = false;
   StreamSubscription<AccelerometerEvent> sub;
@@ -61,6 +61,7 @@ class _CameraScreenState extends State<CameraScreen>
       y = (event.y / 9.81).round();
       z = (event.z / 9.81).round();
     });
+    folderCount = Settings.getValue('folders', 0);
     if (Settings.getValue('newusercamera', true)) {
       Future.delayed(
           Duration.zero,
