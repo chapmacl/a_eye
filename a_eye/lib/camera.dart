@@ -101,6 +101,7 @@ class _CameraState extends State<Camera> {
         ],
       );
     } else if (permission == false) {
+      // TODO maybe check for storage too
       return Column(
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
