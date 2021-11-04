@@ -7,20 +7,12 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:809119698945:android:9437d99506ac47f293f000",
+        "mobilesdk_app_id": "1:809119698945:android:5e341edb97918ffc93f000",
         "android_client_info": {
-          "package_name": "com.example.a_eye"
+          "package_name": "com.chapmacl.a_eye"
         }
       },
       "oauth_client": [
-        {
-          "client_id": "809119698945-3fgiq1286of1n07r4u59vliv9598dcvm.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.example.a_eye",
-            "certificate_hash": "1e04a243dd4586dabdcd19a9d82515537c45cbda"
-          }
-        },
         {
           "client_id": "809119698945-pegjnudhfhm1seb33ka0lstp9lsr36aa.apps.googleusercontent.com",
           "client_type": 3
@@ -28,7 +20,7 @@
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyCUwWLf8B-p_ei7QUcmI-kQVLjNkjZTvOg"
+          "current_key": "AIzaSyAVVeNFbGPlYv5IpCUhAWsCN5CkZ-tOtv0"
         }
       ],
       "services": {
@@ -37,6 +29,13 @@
             {
               "client_id": "809119698945-pegjnudhfhm1seb33ka0lstp9lsr36aa.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "809119698945-6pofm32fuskv97impq5m5l20kb5eju5i.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.aEye"
+              }
             }
           ]
         }
