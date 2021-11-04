@@ -18,41 +18,6 @@ class Backend {
   static GoogleSignInAccount googleSignInAccount;
   static User user = auth.currentUser;
 
-  // TODO remove
-  // static SnackBar customSnackBar({String content}) {
-  //   return SnackBar(
-  //     backgroundColor: Colors.transparent,
-  //     elevation: 0,
-  //     content: Container(
-  //         padding: const EdgeInsets.all(8),
-  //         decoration: BoxDecoration(
-  //           color: AppTheme.notWhite,
-  //           border: Border.all(color: AppTheme.appIndigo, width: 1),
-  //           boxShadow: const [
-  //             BoxShadow(
-  //               color: Color(0x19000000),
-  //               spreadRadius: 2.0,
-  //               blurRadius: 8.0,
-  //               offset: Offset(2, 4),
-  //             )
-  //           ],
-  //           borderRadius: BorderRadius.circular(4),
-  //         ),
-  //         child: Row(
-  //           children: [
-  //             Padding(
-  //               padding: EdgeInsets.only(left: 8.0),
-  //               child: Text(
-  //                 content,
-  //                 style: AppTheme.title,
-  //                 textAlign: TextAlign.center,
-  //               ),
-  //             ),
-  //           ],
-  //         )),
-  //   );
-  // }
-
   static Future<FirebaseApp> initializeFirebase({
     BuildContext context,
   }) async {

@@ -5,6 +5,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
 import 'package:flutter_settings_screens/flutter_settings_screens.dart';
+import 'package:ndialog/ndialog.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:sensors_plus/sensors_plus.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 import 'package:tflite/tflite.dart';
@@ -112,16 +114,43 @@ class _CameraScreenState extends State<CameraScreen>
     return Scaffold(
       floatingActionButton: FloatingActionButton(
           backgroundColor: _model ? AppTheme.appBlue : Colors.grey,
-          onPressed: () {
-            if (!_model) {
-              _controller.forward();
-            } else {
-              _controller.reverse();
+          onPressed: () async {
+            var answer = await Permission.storage.request();
+            if (answer == PermissionStatus.granted) {
+              if (!_model) {
+                _controller.forward();
+              } else {
+                _controller.reverse();
+              }
+              setState(() {
+                _model = !_model;
+              });
+              Wakelock.enable();
+            } else if (answer == PermissionStatus.permanentlyDenied) {
+              DialogBackground(
+                blur: 2.0,
+                dialog: AlertDialog(
+                  title: Text("Storage"),
+                  content: Text(
+                      "You need to allow storage permissions to save photos and video."),
+                  actions: <Widget>[
+                    TextButton(
+                      child: Text("Go to settings"),
+                      onPressed: () {
+                        Navigator.pop(context);
+                        openAppSettings();
+                      },
+                    ),
+                    TextButton(
+                      child: Text("Ok"),
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                    )
+                  ],
+                ),
+              ).show(context, transitionType: DialogTransitionType.Bubble);
             }
-            setState(() {
-              _model = !_model;
-            });
-            Wakelock.enable();
           },
           child: AnimatedIcon(
             icon: AnimatedIcons.play_pause,
