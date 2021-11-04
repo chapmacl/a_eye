@@ -34,10 +34,13 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
+      // TODO check if user is new or not, return appropriate home screen
       home: MyHomePage(),
     );
   }
 }
+
+// TODO create introduction class here
 
 class MyHomePage extends StatefulWidget {
   MyHomePage({Key key}) : super(key: key);
