@@ -37,6 +37,7 @@ class _FileScreenState extends State<FileScreen> {
   bool isLocal;
   ScrollController controller = ScrollController();
   final FlutterFFmpeg _flutterFFmpeg = new FlutterFFmpeg();
+  int folderCount;
 
   bool myInterceptor(bool stopDefaultButtonEvent, RouteInfo info) {
     if (subdirs.length > 0) {
@@ -82,6 +83,7 @@ class _FileScreenState extends State<FileScreen> {
     BackButtonInterceptor.add(myInterceptor);
     _photoDir = 'null';
     isLocal = null;
+    folderCount = Settings.getValue('folders', 0);
     if (Settings.getValue('newuserfile', true)) {
       Future.delayed(
           Duration.zero,
