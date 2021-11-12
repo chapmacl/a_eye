@@ -86,7 +86,7 @@ class _FileScreenState extends State<FileScreen> {
     folderCount = Settings.getValue('folders', 0);
     if (Settings.getValue('newuserfile', true)) {
       Future.delayed(
-          Duration.zero,
+          Duration(milliseconds: 100),
           () => DialogBackground(
                 blur: 2.0,
                 dialog: AlertDialog(
@@ -672,6 +672,7 @@ class _FileScreenState extends State<FileScreen> {
                           )
                         ],
                       )
+                    // TODO put this inside column, do stuff with free user reminder there
                     : DraggableScrollbar.semicircle(
                         controller: controller,
                         labelConstraints:

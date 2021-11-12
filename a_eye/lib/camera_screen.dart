@@ -64,7 +64,7 @@ class _CameraScreenState extends State<CameraScreen>
     folderCount = Settings.getValue('folders', 0);
     if (Settings.getValue('newusercamera', true)) {
       Future.delayed(
-          Duration.zero,
+          Duration(milliseconds: 100),
           () => DialogBackground(
                 blur: 2.0,
                 dialog: AlertDialog(
