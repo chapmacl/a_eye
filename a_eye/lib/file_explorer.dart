@@ -84,35 +84,6 @@ class _FileScreenState extends State<FileScreen> {
     _photoDir = 'null';
     isLocal = null;
     folderCount = Settings.getValue('folders', 0);
-    if (Settings.getValue('newuserfile', true)) {
-      Future.delayed(
-          Duration(milliseconds: 100),
-          () => DialogBackground(
-                blur: 2.0,
-                dialog: AlertDialog(
-                  title: Text("Photos"),
-                  content: Stack(
-                    children: [
-                      Image.asset('assets/images/hold.gif'),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text(
-                            "On this screen you can see all the photos and videos A.Eye. has captured. Tap and hold folders and files to see more options."),
-                      ),
-                    ],
-                  ),
-                  actions: <Widget>[
-                    TextButton(
-                      child: Text("Ok"),
-                      onPressed: () async {
-                        await Settings.setValue('newuserfile', false);
-                        Navigator.pop(context);
-                      },
-                    )
-                  ],
-                ),
-              ).show(context, transitionType: DialogTransitionType.Bubble));
-    }
   }
 
   @override

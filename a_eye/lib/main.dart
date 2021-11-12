@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:a_eye/file_explorer.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_settings_screens/flutter_settings_screens.dart';
+import 'package:ndialog/ndialog.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'camera_screen.dart';
 
@@ -75,6 +76,71 @@ class _MyHomePageState extends State<MyHomePage> {
           controller: _pageController,
           onPageChanged: (index) {
             setState(() => _currentIndex = index);
+            if (!newUser) {
+              if (index == 0 && Settings.getValue('newuserfile', true)) {
+                Future.delayed(
+                    Duration(milliseconds: 100),
+                    () => DialogBackground(
+                          blur: 2.0,
+                          dialog: AlertDialog(
+                            title: Text("Photos"),
+                            content: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Image.asset('assets/images/hold.gif'),
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Text(
+                                      "On this screen you can see all the photos and videos A.Eye. has captured. Tap and hold folders and files to see more options."),
+                                ),
+                              ],
+                            ),
+                            actions: <Widget>[
+                              TextButton(
+                                child: Text("Ok"),
+                                onPressed: () async {
+                                  await Settings.setValue('newuserfile', false);
+                                  Navigator.pop(context);
+                                },
+                              )
+                            ],
+                          ),
+                        ).show(context,
+                            transitionType: DialogTransitionType.Bubble));
+              } else if (index == 1 &&
+                  Settings.getValue('newusercamera', true)) {
+                Future.delayed(
+                    Duration(milliseconds: 100),
+                    () => DialogBackground(
+                          blur: 2.0,
+                          dialog: AlertDialog(
+                            title: Text("Camera"),
+                            content: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Image.asset('assets/images/tap.gif'),
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Text(
+                                      "On this screen you can see what A.Eye. is looking at. Tap on Quick Settings to adjust various settings. Don't forget to press the Play button when you're ready for A.Eye to start capturing photos!"),
+                                ),
+                              ],
+                            ),
+                            actions: <Widget>[
+                              TextButton(
+                                child: Text("Ok"),
+                                onPressed: () async {
+                                  await Settings.setValue(
+                                      'newusercamera', false);
+                                  Navigator.pop(context);
+                                },
+                              )
+                            ],
+                          ),
+                        ).show(context,
+                            transitionType: DialogTransitionType.Bubble));
+              }
+            }
           },
           children: newUser
               ? [
@@ -152,7 +218,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           'The Cloud lets you view captured photos and videos on any device. '
                           'Unlimited Cloud storage is available to subscribers.',
                           textAlign: TextAlign.center,
-                          style: AppTheme.title,
+                          style: AppTheme.title2,
                         ),
                       ),
                       ElevatedButton(
@@ -161,6 +227,8 @@ class _MyHomePageState extends State<MyHomePage> {
                           await Settings.setValue('newuser', false);
                           setState(() {
                             newUser = false;
+                            _currentIndex = 1;
+                            _pageController.jumpTo(1);
                           });
                         },
                       )
