@@ -95,7 +95,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       ElevatedButton(
                         child: Text('Next'),
                         onPressed: () {
-                          _pageController.animateToPage(1,
+                          _pageController.nextPage(
                               curve: Curves.easeOut,
                               duration: Duration(milliseconds: 250));
                         },
@@ -130,7 +130,7 @@ class _MyHomePageState extends State<MyHomePage> {
                             }
                           }
                           if (permissions) {
-                            _pageController.animateToPage(1,
+                            _pageController.nextPage(
                                 curve: Curves.easeOut,
                                 duration: Duration(milliseconds: 250));
                           }
