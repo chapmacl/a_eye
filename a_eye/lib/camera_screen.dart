@@ -62,35 +62,6 @@ class _CameraScreenState extends State<CameraScreen>
       z = (event.z / 9.81).round();
     });
     folderCount = Settings.getValue('folders', 0);
-    if (Settings.getValue('newusercamera', true)) {
-      Future.delayed(
-          Duration(milliseconds: 100),
-          () => DialogBackground(
-                blur: 2.0,
-                dialog: AlertDialog(
-                  title: Text("Camera"),
-                  content: Stack(
-                    children: [
-                      Image.asset('assets/images/tap.gif'),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text(
-                            "On this screen you can see what A.Eye. is looking at. Tap on Quick Settings to adjust various settings. Don't forget to press the Play button when you're ready for A.Eye to start capturing photos!"),
-                      ),
-                    ],
-                  ),
-                  actions: <Widget>[
-                    TextButton(
-                      child: Text("Ok"),
-                      onPressed: () async {
-                        await Settings.setValue('newusercamera', false);
-                        Navigator.pop(context);
-                      },
-                    )
-                  ],
-                ),
-              ).show(context, transitionType: DialogTransitionType.Bubble));
-    }
   }
 
   loadModel() async {
