@@ -122,7 +122,7 @@ class AppTheme {
     fontWeight: FontWeight.w400,
     fontSize: 14,
     letterSpacing: -0.04,
-    color: darkText,
+    color: appIndigo,
     fontStyle: FontStyle.normal,
   );
 
