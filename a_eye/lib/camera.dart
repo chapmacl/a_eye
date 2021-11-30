@@ -191,6 +191,9 @@ class _CameraState extends State<Camera> {
       Future.delayed(Duration(milliseconds: 250), () {});
 
       controller.startImageStream((CameraImage img) async {
+        // TODO create method with Timer(const Duration(seconds: 10), () => callback());
+        // to only check every few seconds by setting isDetecting to true
+        // once an object is detected automatically shut off the sleep function until cooldown expires
         if (!isDetecting) {
           isDetecting = true;
           int startTime = new DateTime.now().millisecondsSinceEpoch;

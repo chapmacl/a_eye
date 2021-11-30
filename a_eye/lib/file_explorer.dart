@@ -19,6 +19,7 @@ import 'package:image_downloader/image_downloader.dart';
 import 'package:ndialog/ndialog.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:sliding_up_panel/sliding_up_panel.dart';
 
 // ignore: must_be_immutable
 class FileScreen extends StatefulWidget {
@@ -38,6 +39,7 @@ class _FileScreenState extends State<FileScreen> {
   ScrollController controller = ScrollController();
   final FlutterFFmpeg _flutterFFmpeg = new FlutterFFmpeg();
   int folderCount;
+  PanelController _pc = new PanelController();
 
   bool myInterceptor(bool stopDefaultButtonEvent, RouteInfo info) {
     if (subdirs.length > 0) {
@@ -141,6 +143,14 @@ class _FileScreenState extends State<FileScreen> {
                   ).show(context, transitionType: DialogTransitionType.Bubble);
                   if (result) {
                     var path = _photoDir;
+                    Fluttertoast.showToast(
+                        msg: "Files are being deleted...",
+                        toastLength: Toast.LENGTH_SHORT,
+                        gravity: ToastGravity.CENTER,
+                        timeInSecForIosWeb: 1,
+                        backgroundColor: AppTheme.notWhite,
+                        textColor: AppTheme.appIndigo,
+                        fontSize: 16.0);
                     delete(path);
                   }
                 }),
@@ -150,8 +160,72 @@ class _FileScreenState extends State<FileScreen> {
         ],
       ),
       backgroundColor: AppTheme.nearlyWhite,
-      body: Center(
-        child: Container(
+      body: SlidingUpPanel(
+          color: AppTheme.notWhite,
+          controller: _pc,
+          minHeight: isLocal == true ? 0 : 40,
+          maxHeight: MediaQuery.of(context).size.height * 0.3,
+          panel: Padding(
+            padding: const EdgeInsets.only(left: 16, right: 16),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(top: 16.0),
+                  child: Text(
+                      folderCount < 0
+                          ? 'Thank you for being a Pro User. All features are available, without restrictions or limits.'
+                          : 'As a free user you can use however much space is available on your phone, but you only have 5 free folders for cloud storage. Cloud storage is useful for securing your data and being able to access it from any mobile device through this app. \n\nPro users can take full advantage of the app and have unlimited Cloud storage.',
+                      textAlign: TextAlign.center),
+                ),
+                folderCount < 0
+                    ? SizedBox()
+                    : Padding(
+                        padding: const EdgeInsets.only(top: 16),
+                        child: ElevatedButton(
+                          child: Text('Unlock Pro Features'),
+                          onPressed: () async {
+                            // TODO revenue cat logic here
+                          },
+                        ),
+                      )
+              ],
+            ),
+          ),
+          header: GestureDetector(
+              onTap: () {
+                if (_pc.isPanelClosed) {
+                  _pc.open();
+                } else {
+                  _pc.close();
+                }
+              },
+              child: Container(
+                  height: 45,
+                  width: MediaQuery.of(context).size.width,
+                  child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        folderCount < 0
+                            ? 'Premium User'
+                            : folderCount == 0
+                                ? '5 Free Cloud Folders remaining'
+                                : folderCount < 4
+                                    ? '${5 - folderCount} Free Cloud Folders remaining'
+                                    : folderCount < 5
+                                        ? '1 Free Cloud Folder remaining'
+                                        : 'No Free Cloud Folders remaining',
+                        style: AppTheme.body2,
+                        textAlign: TextAlign.center,
+                      )),
+                  decoration: BoxDecoration(
+                      color: Colors.blueGrey,
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(24.0),
+                        topRight: Radius.circular(24.0),
+                      )))),
+          body: Center(
+              child: Container(
             child: _photoDir == null
                 ? Center(
                     child: SpinKitFadingGrid(
@@ -162,8 +236,8 @@ class _FileScreenState extends State<FileScreen> {
                     ? rootGrid()
                     : isLocal
                         ? imageGrid(_photoDir)
-                        : cloudImageGrid(_photoDir)),
-      ),
+                        : cloudImageGrid(_photoDir),
+          ))),
     );
   }
 
@@ -197,6 +271,7 @@ class _FileScreenState extends State<FileScreen> {
     });
   }
 
+// TODO update folders count here
   void delete(var path) async {
     updateDir(null);
     if (isLocal) {
@@ -346,6 +421,7 @@ class _FileScreenState extends State<FileScreen> {
                                   await Backend.uploadFile(
                                       File(path), folderName);
                                 }
+                                // TODO update folders count
                               })
                         ],
                         FocusedMenuItem(
@@ -643,14 +719,11 @@ class _FileScreenState extends State<FileScreen> {
                           )
                         ],
                       )
-                    // TODO put this inside column, do stuff with free user reminder there
                     : DraggableScrollbar.semicircle(
                         controller: controller,
                         labelConstraints:
                             BoxConstraints.tightFor(width: 80.0, height: 30.0),
                         backgroundColor: AppTheme.notWhite,
-                        // TODO if free user is logged in and at limit, show some sort of message
-                        // Make this tappable with popup message, then take user to checkout page
                         child: GridView.builder(
                           controller: controller,
                           physics: BouncingScrollPhysics(),

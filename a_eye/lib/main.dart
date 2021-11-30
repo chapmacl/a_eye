@@ -218,7 +218,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           'The Cloud lets you view captured photos and videos on any device. '
                           'Unlimited Cloud storage is available to subscribers.',
                           textAlign: TextAlign.center,
-                          style: AppTheme.title2,
+                          style: AppTheme.subtitle2,
                         ),
                       ),
                       ElevatedButton(
