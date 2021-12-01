@@ -75,6 +75,9 @@ class _CameraState extends State<Camera> {
 
   @override
   void dispose() {
+    // Future.delayed(Duration.zero, () async {
+    //   await controller?.dispose();
+    // });
     controller?.dispose();
     super.dispose();
   }
@@ -194,6 +197,9 @@ class _CameraState extends State<Camera> {
         // TODO create method with Timer(const Duration(seconds: 10), () => callback());
         // to only check every few seconds by setting isDetecting to true
         // once an object is detected automatically shut off the sleep function until cooldown expires
+
+        //isDetecting = true;
+
         if (!isDetecting) {
           isDetecting = true;
           int startTime = new DateTime.now().millisecondsSinceEpoch;
