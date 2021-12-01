@@ -224,20 +224,25 @@ class _FileScreenState extends State<FileScreen> {
                         topLeft: Radius.circular(24.0),
                         topRight: Radius.circular(24.0),
                       )))),
-          body: Center(
-              child: Container(
-            child: _photoDir == null
-                ? Center(
-                    child: SpinKitFadingGrid(
-                    color: AppTheme.appIndigo,
-                    size: 100,
-                  ))
-                : isLocal == null
-                    ? rootGrid()
-                    : isLocal
-                        ? imageGrid(_photoDir)
-                        : cloudImageGrid(_photoDir),
-          ))),
+          body: _photoDir == null
+              ? Center(
+                  child: SpinKitFadingGrid(
+                  color: AppTheme.appIndigo,
+                  size: 100,
+                ))
+              : isLocal == null
+                  ? rootGrid()
+                  : Align(
+                      alignment: Alignment.topLeft,
+                      child: Container(
+                        // TODO find correct height for this (might be magic number)
+                        height: MediaQuery.of(context).size.height -
+                            (AppBar().preferredSize.height + 40 + 60) * 1.1,
+                        child: isLocal
+                            ? imageGrid(_photoDir)
+                            : cloudImageGrid(_photoDir),
+                      ),
+                    )),
     );
   }
 
@@ -321,11 +326,13 @@ class _FileScreenState extends State<FileScreen> {
                 ],
               )
             : DraggableScrollbar.semicircle(
+                alwaysVisibleScrollThumb: true,
                 controller: controller,
                 labelConstraints:
                     BoxConstraints.tightFor(width: 80.0, height: 30.0),
                 backgroundColor: AppTheme.notWhite,
                 child: GridView.builder(
+                  shrinkWrap: true,
                   controller: controller,
                   physics: BouncingScrollPhysics(),
                   itemCount: imageList.length,
