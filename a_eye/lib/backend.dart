@@ -141,6 +141,7 @@ class Backend {
     return q.exists;
   }
 
+// TODO change this (possibly 1 dict per device to separate them)
   static Future uploadFile(File file, String parent_dir) async {
     Reference ref = storage.ref().child(
         '${user.uid}/${parent_dir}/${path.basename(file.absolute.path)}');
