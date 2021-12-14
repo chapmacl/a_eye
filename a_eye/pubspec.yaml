@@ -34,12 +34,10 @@ dependencies:
   fluttertoast: ^8.0.8
   focused_menu: ^1.0.5
   google_sign_in: ^5.0.4
-  image_downloader: ^0.30.0
   image: ^3.0.2
   intl: ^0.17.0
   ndialog: ^4.1.0
   path_provider: ^2.0.1
-  photo_view: ^0.13.0
   permission_handler: ^8.2.5
   sensors_plus: ^1.0.2
   share_plus: ^3.0.1
