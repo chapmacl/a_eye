@@ -305,168 +305,173 @@ class _FileScreenState extends State<FileScreen> {
 
     return Padding(
       padding: const EdgeInsets.all(8.0),
-      child: Container(
-        color: AppTheme.nearlyWhite,
-        child: videoList.isEmpty
-            ? Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.search,
-                    color: AppTheme.appIndigo,
-                  ),
-                  Text(
-                    "No Photos yet...",
-                    style: AppTheme.title2,
-                  )
-                ],
-              )
-            : DraggableScrollbar.semicircle(
-                alwaysVisibleScrollThumb: true,
-                controller: controller,
-                labelConstraints:
-                    BoxConstraints.tightFor(width: 80.0, height: 30.0),
-                backgroundColor: AppTheme.notWhite,
-                child: GridView.builder(
-                  shrinkWrap: true,
+      child: Center(
+        child: Container(
+          color: AppTheme.nearlyWhite,
+          child: videoList.isEmpty
+              ? Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.search,
+                      color: AppTheme.appIndigo,
+                    ),
+                    Text(
+                      "No Photos yet...",
+                      style: AppTheme.title2,
+                    )
+                  ],
+                )
+              : DraggableScrollbar.semicircle(
+                  alwaysVisibleScrollThumb: true,
                   controller: controller,
-                  physics: BouncingScrollPhysics(),
-                  itemCount: videoList.length,
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 3),
-                  itemBuilder: (context, index) {
-                    List filePath = videoList[index].split('/');
-                    String name = filePath.last;
-                    String folderName = name;
+                  labelConstraints:
+                      BoxConstraints.tightFor(width: 80.0, height: 30.0),
+                  backgroundColor: AppTheme.notWhite,
+                  child: GridView.builder(
+                    shrinkWrap: true,
+                    controller: controller,
+                    physics: BouncingScrollPhysics(),
+                    itemCount: videoList.length,
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 3),
+                    itemBuilder: (context, index) {
+                      List filePath = videoList[index].split('/');
+                      String name = filePath.last;
+                      String folderName = name;
 
-                    return FocusedMenuHolder(
-                      menuWidth: MediaQuery.of(context).size.width * 0.50,
-                      blurSize: 5.0,
-                      menuItemExtent: 45,
-                      menuBoxDecoration: BoxDecoration(
-                          color: Colors.grey,
-                          borderRadius:
-                              BorderRadius.all(Radius.circular(15.0))),
-                      duration: Duration(milliseconds: 100),
-                      animateMenuItems: true,
-                      blurBackgroundColor: Colors.black54,
-                      openWithTap: false,
-                      menuOffset: 10.0,
-                      bottomOffsetHeight: 80.0,
-                      menuItems: <FocusedMenuItem>[
-                        FocusedMenuItem(
-                            title: Text("Share"),
-                            trailingIcon: Icon(Icons.share),
-                            onPressed: () {
-                              var text = dateToString(name);
-                              Share.shareFiles([videoList[index]], text: text);
-                            }),
-                        FocusedMenuItem(
-                            title: Text(
-                              "Delete",
-                              style: TextStyle(color: Colors.redAccent),
-                            ),
-                            trailingIcon: Icon(
-                              Icons.delete,
-                              color: Colors.redAccent,
-                            ),
-                            onPressed: () async {
-                              bool result = await DialogBackground(
-                                blur: 2.0,
-                                dialog: AlertDialog(
-                                  title: Text("Delete"),
-                                  content: Text("Are you sure?"),
-                                  actions: <Widget>[
-                                    TextButton(
-                                      child: Text("No"),
-                                      onPressed: () {
-                                        Navigator.pop(context, false);
-                                      },
-                                    ),
-                                    TextButton(
-                                      child: Text("Yes"),
-                                      onPressed: () {
-                                        Navigator.pop(context, true);
-                                      },
-                                    )
-                                  ],
-                                ),
-                              ).show(context,
-                                  transitionType: DialogTransitionType.Bubble);
-                              if (result) {
-                                // Adds current dir, then force to null to trigger loading animation. After deletion current directory is reloaded
-                                subdirs.add(_videoDir);
-                                delete(videoList[index]);
-                              } else {
-                                print('else');
-                              }
-                            }),
-                      ],
-                      onPressed: () {},
-                      child: Card(
-                        elevation: 4,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8.0),
-                        ),
-                        child: InkWell(
-                            onTap: () => {
-                                  videoList[index].endsWith('.mp4')
-                                      ? {
-                                          subdirs.add('photo'),
-                                          Navigator.of(context)
-                                              .push(MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      VideoScreen(
-                                                          videoList[index],
-                                                          isLocal)))
-                                              .then((value) {
-                                            if (value == 'pop') {
-                                              subdirs.removeLast();
-                                            } else if (value == 'delete') {
-                                              subdirs.removeLast();
-                                              subdirs.add(_videoDir);
-                                              delete(videoList[index]);
-                                            }
-                                          })
-                                        }
-                                      : {
-                                          subdirs.add(_videoDir),
-                                          updateDir(videoList[index])
-                                        }
-                                },
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(8.0),
-                              child: Stack(
-                                fit: StackFit.expand,
-                                children: [
-                                  // Image.file(
-                                  //   // TODO thumbnail
-                                  //   index == imageList.length - 1
-                                  //       ? File(imageList[index - 1])
-                                  //       : File(imageList[index + 1]),
-                                  //   fit: BoxFit.fill,
-                                  // ),
-                                  Center(
-                                    child: CircleAvatar(
-                                      backgroundColor:
-                                          Colors.white.withOpacity(0.8),
-                                      radius: 25,
-                                      child: Icon(
-                                        Icons.play_circle_fill_rounded,
-                                        size: 50,
-                                        color: Colors.blueGrey.withOpacity(0.8),
+                      return FocusedMenuHolder(
+                        menuWidth: MediaQuery.of(context).size.width * 0.50,
+                        blurSize: 5.0,
+                        menuItemExtent: 45,
+                        menuBoxDecoration: BoxDecoration(
+                            color: Colors.grey,
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(15.0))),
+                        duration: Duration(milliseconds: 100),
+                        animateMenuItems: true,
+                        blurBackgroundColor: Colors.black54,
+                        openWithTap: false,
+                        menuOffset: 10.0,
+                        bottomOffsetHeight: 80.0,
+                        menuItems: <FocusedMenuItem>[
+                          FocusedMenuItem(
+                              title: Text("Share"),
+                              trailingIcon: Icon(Icons.share),
+                              onPressed: () {
+                                var text = dateToString(name);
+                                Share.shareFiles([videoList[index]],
+                                    text: text);
+                              }),
+                          FocusedMenuItem(
+                              title: Text(
+                                "Delete",
+                                style: TextStyle(color: Colors.redAccent),
+                              ),
+                              trailingIcon: Icon(
+                                Icons.delete,
+                                color: Colors.redAccent,
+                              ),
+                              onPressed: () async {
+                                bool result = await DialogBackground(
+                                  blur: 2.0,
+                                  dialog: AlertDialog(
+                                    title: Text("Delete"),
+                                    content: Text("Are you sure?"),
+                                    actions: <Widget>[
+                                      TextButton(
+                                        child: Text("No"),
+                                        onPressed: () {
+                                          Navigator.pop(context, false);
+                                        },
+                                      ),
+                                      TextButton(
+                                        child: Text("Yes"),
+                                        onPressed: () {
+                                          Navigator.pop(context, true);
+                                        },
+                                      )
+                                    ],
+                                  ),
+                                ).show(context,
+                                    transitionType:
+                                        DialogTransitionType.Bubble);
+                                if (result) {
+                                  // Adds current dir, then force to null to trigger loading animation. After deletion current directory is reloaded
+                                  subdirs.add(_videoDir);
+                                  delete(videoList[index]);
+                                } else {
+                                  print('else');
+                                }
+                              }),
+                        ],
+                        onPressed: () {},
+                        child: Card(
+                          elevation: 4,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8.0),
+                          ),
+                          child: InkWell(
+                              onTap: () => {
+                                    videoList[index].endsWith('.mp4')
+                                        ? {
+                                            subdirs.add('photo'),
+                                            Navigator.of(context)
+                                                .push(MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        VideoScreen(
+                                                            videoList[index],
+                                                            isLocal)))
+                                                .then((value) {
+                                              if (value == 'pop') {
+                                                subdirs.removeLast();
+                                              } else if (value == 'delete') {
+                                                subdirs.removeLast();
+                                                subdirs.add(_videoDir);
+                                                delete(videoList[index]);
+                                              }
+                                            })
+                                          }
+                                        : {
+                                            subdirs.add(_videoDir),
+                                            updateDir(videoList[index])
+                                          }
+                                  },
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(8.0),
+                                child: Stack(
+                                  fit: StackFit.expand,
+                                  children: [
+                                    // Image.file(
+                                    //   // TODO thumbnail
+                                    //   index == imageList.length - 1
+                                    //       ? File(imageList[index - 1])
+                                    //       : File(imageList[index + 1]),
+                                    //   fit: BoxFit.fill,
+                                    // ),
+                                    Center(
+                                      child: CircleAvatar(
+                                        backgroundColor:
+                                            Colors.white.withOpacity(0.8),
+                                        radius: 25,
+                                        child: Icon(
+                                          Icons.play_circle_fill_rounded,
+                                          size: 50,
+                                          color:
+                                              Colors.blueGrey.withOpacity(0.8),
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                ],
-                              ),
-                            )),
-                      ),
-                    );
-                  },
+                                  ],
+                                ),
+                              )),
+                        ),
+                      );
+                    },
+                  ),
                 ),
-              ),
+        ),
       ),
     );
   }
@@ -614,179 +619,185 @@ class _FileScreenState extends State<FileScreen> {
             directory.sort((a, b) => b.toString().compareTo(a.toString()));
             return Padding(
               padding: const EdgeInsets.all(8.0),
-              child: Container(
-                color: AppTheme.nearlyWhite,
-                child: directory.isEmpty
-                    ? Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Icon(
-                            Icons.search,
-                            color: AppTheme.appIndigo,
-                          ),
-                          Text(
-                            "No Photos yet...",
-                            style: AppTheme.title2,
-                          )
-                        ],
-                      )
-                    : DraggableScrollbar.semicircle(
-                        controller: controller,
-                        labelConstraints:
-                            BoxConstraints.tightFor(width: 80.0, height: 30.0),
-                        backgroundColor: AppTheme.notWhite,
-                        child: GridView.builder(
+              child: Center(
+                child: Container(
+                  color: AppTheme.nearlyWhite,
+                  child: directory.isEmpty
+                      ? Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.search,
+                              color: AppTheme.appIndigo,
+                            ),
+                            Text(
+                              "No Photos yet...",
+                              style: AppTheme.title2,
+                            )
+                          ],
+                        )
+                      : DraggableScrollbar.semicircle(
                           controller: controller,
-                          physics: BouncingScrollPhysics(),
-                          itemCount: directory.length,
-                          gridDelegate:
-                              SliverGridDelegateWithFixedCrossAxisCount(
-                                  crossAxisCount: 3),
-                          itemBuilder: (context, index) {
-                            return FocusedMenuHolder(
-                              menuWidth:
-                                  MediaQuery.of(context).size.width * 0.50,
-                              blurSize: 5.0,
-                              menuItemExtent: 45,
-                              menuBoxDecoration: BoxDecoration(
-                                  color: Colors.grey,
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(15.0))),
-                              duration: Duration(milliseconds: 100),
-                              animateMenuItems: true,
-                              blurBackgroundColor: Colors.black54,
-                              openWithTap: false,
-                              menuOffset: 10.0,
-                              bottomOffsetHeight: 80.0,
-                              menuItems: <FocusedMenuItem>[
-                                FocusedMenuItem(
-                                    title: Text("Download"),
-                                    trailingIcon: Icon(Icons.download_rounded),
-                                    onPressed: () async {
-                                      Fluttertoast.showToast(
-                                          msg: "Downloading...",
-                                          toastLength: Toast.LENGTH_SHORT,
-                                          gravity: ToastGravity.CENTER,
-                                          timeInSecForIosWeb: 1,
-                                          backgroundColor: AppTheme.notWhite,
-                                          textColor: AppTheme.appIndigo,
-                                          fontSize: 16.0);
+                          labelConstraints: BoxConstraints.tightFor(
+                              width: 80.0, height: 30.0),
+                          backgroundColor: AppTheme.notWhite,
+                          child: GridView.builder(
+                            controller: controller,
+                            physics: BouncingScrollPhysics(),
+                            itemCount: directory.length,
+                            gridDelegate:
+                                SliverGridDelegateWithFixedCrossAxisCount(
+                                    crossAxisCount: 3),
+                            itemBuilder: (context, index) {
+                              return FocusedMenuHolder(
+                                menuWidth:
+                                    MediaQuery.of(context).size.width * 0.50,
+                                blurSize: 5.0,
+                                menuItemExtent: 45,
+                                menuBoxDecoration: BoxDecoration(
+                                    color: Colors.grey,
+                                    borderRadius: BorderRadius.all(
+                                        Radius.circular(15.0))),
+                                duration: Duration(milliseconds: 100),
+                                animateMenuItems: true,
+                                blurBackgroundColor: Colors.black54,
+                                openWithTap: false,
+                                menuOffset: 10.0,
+                                bottomOffsetHeight: 80.0,
+                                menuItems: <FocusedMenuItem>[
+                                  FocusedMenuItem(
+                                      title: Text("Download"),
+                                      trailingIcon:
+                                          Icon(Icons.download_rounded),
+                                      onPressed: () async {
+                                        Fluttertoast.showToast(
+                                            msg: "Downloading...",
+                                            toastLength: Toast.LENGTH_SHORT,
+                                            gravity: ToastGravity.CENTER,
+                                            timeInSecForIosWeb: 1,
+                                            backgroundColor: AppTheme.notWhite,
+                                            textColor: AppTheme.appIndigo,
+                                            fontSize: 16.0);
 
-                                      // TODO add another downloader option
-                                      // if (directory[index].endsWith('.mp4')) {
-                                      //   await ImageDownloader.downloadImage(
-                                      //       results[directory[index]]);
-                                      // }
-                                    }),
-                                FocusedMenuItem(
-                                    title: Text(
-                                      "Delete",
-                                      style: TextStyle(color: Colors.redAccent),
-                                    ),
-                                    trailingIcon: Icon(
-                                      Icons.delete,
-                                      color: Colors.redAccent,
-                                    ),
-                                    onPressed: () async {
-                                      bool result = await DialogBackground(
-                                        blur: 2.0,
-                                        dialog: AlertDialog(
-                                          title: Text("Delete"),
-                                          content: Text("Are you sure?"),
-                                          actions: <Widget>[
-                                            TextButton(
-                                              child: Text("No"),
-                                              onPressed: () {
-                                                Navigator.pop(context, false);
-                                              },
-                                            ),
-                                            TextButton(
-                                              child: Text("Yes"),
-                                              onPressed: () {
-                                                Navigator.pop(context, true);
-                                              },
-                                            )
-                                          ],
-                                        ),
-                                      ).show(context,
-                                          transitionType:
-                                              DialogTransitionType.Bubble);
-                                      if (result) {
-                                        // Add current dir, then force to null to trigger loading animation. After deletion current directory is reloaded
-                                        subdirs.add(_videoDir);
-                                        delete(results[directory[index]]);
-                                      } else {
-                                        print('else');
-                                      }
-                                    }),
-                              ],
-                              onPressed: () {},
-                              child: Card(
-                                elevation: 4,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8.0),
-                                ),
-                                child: InkWell(
-                                    onTap: () => {
-                                          directory[index].endsWith('.mp4')
-                                              ? {
-                                                  subdirs.add('photo'),
-                                                  Navigator.of(context)
-                                                      .push(MaterialPageRoute(
-                                                          builder: (context) =>
-                                                              VideoScreen(
-                                                                  results[
-                                                                      directory[
-                                                                          index]],
-                                                                  isLocal)))
-                                                      .then((value) {
-                                                    if (value == 'pop') {
-                                                      subdirs.removeLast();
-                                                    } else if (value ==
-                                                        'delete') {
-                                                      subdirs.removeLast();
-                                                      subdirs.add(_videoDir);
-                                                      delete(directory[index]);
-                                                    }
-                                                  })
-                                                }
-                                              : {
-                                                  subdirs.add(_videoDir),
-                                                  updateDir(directory[index])
-                                                }
-                                        },
-                                    child: ClipRRect(
-                                      borderRadius: BorderRadius.circular(8.0),
-                                      child: Stack(
-                                        fit: StackFit.expand,
-                                        children: [
-                                          // Image.network(
-                                          //   // TODO thumbnail
-                                          //   results[directory[1]],
-                                          //   fit: BoxFit.cover,
-                                          // ),
-                                          Center(
-                                            child: CircleAvatar(
-                                              backgroundColor:
-                                                  Colors.white.withOpacity(0.8),
-                                              radius: 25,
-                                              child: Icon(
-                                                Icons.play_circle_fill_rounded,
-                                                size: 50,
-                                                color: Colors.blueGrey
+                                        // TODO add another downloader option
+                                        // if (directory[index].endsWith('.mp4')) {
+                                        //   await ImageDownloader.downloadImage(
+                                        //       results[directory[index]]);
+                                        // }
+                                      }),
+                                  FocusedMenuItem(
+                                      title: Text(
+                                        "Delete",
+                                        style:
+                                            TextStyle(color: Colors.redAccent),
+                                      ),
+                                      trailingIcon: Icon(
+                                        Icons.delete,
+                                        color: Colors.redAccent,
+                                      ),
+                                      onPressed: () async {
+                                        bool result = await DialogBackground(
+                                          blur: 2.0,
+                                          dialog: AlertDialog(
+                                            title: Text("Delete"),
+                                            content: Text("Are you sure?"),
+                                            actions: <Widget>[
+                                              TextButton(
+                                                child: Text("No"),
+                                                onPressed: () {
+                                                  Navigator.pop(context, false);
+                                                },
+                                              ),
+                                              TextButton(
+                                                child: Text("Yes"),
+                                                onPressed: () {
+                                                  Navigator.pop(context, true);
+                                                },
+                                              )
+                                            ],
+                                          ),
+                                        ).show(context,
+                                            transitionType:
+                                                DialogTransitionType.Bubble);
+                                        if (result) {
+                                          // Add current dir, then force to null to trigger loading animation. After deletion current directory is reloaded
+                                          subdirs.add(_videoDir);
+                                          delete(results[directory[index]]);
+                                        } else {
+                                          print('else');
+                                        }
+                                      }),
+                                ],
+                                onPressed: () {},
+                                child: Card(
+                                  elevation: 4,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8.0),
+                                  ),
+                                  child: InkWell(
+                                      onTap: () => {
+                                            directory[index].endsWith('.mp4')
+                                                ? {
+                                                    subdirs.add('photo'),
+                                                    Navigator.of(context)
+                                                        .push(MaterialPageRoute(
+                                                            builder: (context) =>
+                                                                VideoScreen(
+                                                                    results[directory[
+                                                                        index]],
+                                                                    isLocal)))
+                                                        .then((value) {
+                                                      if (value == 'pop') {
+                                                        subdirs.removeLast();
+                                                      } else if (value ==
+                                                          'delete') {
+                                                        subdirs.removeLast();
+                                                        subdirs.add(_videoDir);
+                                                        delete(
+                                                            directory[index]);
+                                                      }
+                                                    })
+                                                  }
+                                                : {
+                                                    subdirs.add(_videoDir),
+                                                    updateDir(directory[index])
+                                                  }
+                                          },
+                                      child: ClipRRect(
+                                        borderRadius:
+                                            BorderRadius.circular(8.0),
+                                        child: Stack(
+                                          fit: StackFit.expand,
+                                          children: [
+                                            // Image.network(
+                                            //   // TODO thumbnail
+                                            //   results[directory[1]],
+                                            //   fit: BoxFit.cover,
+                                            // ),
+                                            Center(
+                                              child: CircleAvatar(
+                                                backgroundColor: Colors.white
                                                     .withOpacity(0.8),
+                                                radius: 25,
+                                                child: Icon(
+                                                  Icons
+                                                      .play_circle_fill_rounded,
+                                                  size: 50,
+                                                  color: Colors.blueGrey
+                                                      .withOpacity(0.8),
+                                                ),
                                               ),
                                             ),
-                                          ),
-                                        ],
-                                      ),
-                                    )),
-                              ),
-                            );
-                          },
+                                          ],
+                                        ),
+                                      )),
+                                ),
+                              );
+                            },
+                          ),
                         ),
-                      ),
+                ),
               ),
             );
           }
