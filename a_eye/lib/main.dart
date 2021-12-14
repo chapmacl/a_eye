@@ -212,6 +212,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       Padding(
                         padding: const EdgeInsets.only(
                             left: 16.0, right: 16.0, bottom: 16.0),
+                        // TODO this needs to be updated
                         child: Text(
                           'Done. \n You\'re all ready to start using A.Eye. smart camera. '
                           'It\'s completely free to use locally, and you can upload and store up to 5 captured events in our Cloud. '
