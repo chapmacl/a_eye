@@ -1,10 +1,9 @@
 import 'dart:io';
 import 'package:a_eye/app_theme.dart';
 import 'package:a_eye/backend.dart';
-import 'package:a_eye/photo_view.dart';
+import 'package:a_eye/video_view.dart';
 import 'package:a_eye/string_functions.dart';
 import 'package:back_button_interceptor/back_button_interceptor.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:draggable_scrollbar/draggable_scrollbar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -32,7 +31,7 @@ class FileScreen extends StatefulWidget {
 }
 
 class _FileScreenState extends State<FileScreen> {
-  var _photoDir;
+  var _videoDir;
   String title = '';
   List subdirs = [];
   bool isLocal;
@@ -49,7 +48,7 @@ class _FileScreenState extends State<FileScreen> {
         return false;
       } else if (last == 'root') {
         setState(() {
-          _photoDir = 'null';
+          _videoDir = 'null';
           isLocal = null;
         });
         return true;
@@ -70,7 +69,7 @@ class _FileScreenState extends State<FileScreen> {
         Navigator.pop(context);
       } else if (last == 'root') {
         setState(() {
-          _photoDir = 'null';
+          _videoDir = 'null';
           isLocal = null;
         });
       } else {
@@ -83,7 +82,7 @@ class _FileScreenState extends State<FileScreen> {
   void initState() {
     super.initState();
     BackButtonInterceptor.add(myInterceptor);
-    _photoDir = 'null';
+    _videoDir = 'null';
     isLocal = null;
     folderCount = Settings.getValue('folders', 0);
   }
@@ -102,7 +101,7 @@ class _FileScreenState extends State<FileScreen> {
         backgroundColor: AppTheme.notWhite,
         title: Text(
           // internal storage uses directories, so the name is known before pulling, whereas with cloud the name is only available after the https call
-          getTitle(_photoDir),
+          getTitle(_videoDir),
           style: AppTheme.title,
         ),
         leading: isLocal == null
@@ -113,7 +112,7 @@ class _FileScreenState extends State<FileScreen> {
                 onPressed: () => customBack(),
               ),
         actions: [
-          if (isLocal != null && _photoDir != 'cloud')
+          if (isLocal != null && _videoDir != 'cloud')
             IconButton(
                 icon: Icon(
                   Icons.delete,
@@ -142,7 +141,7 @@ class _FileScreenState extends State<FileScreen> {
                     ),
                   ).show(context, transitionType: DialogTransitionType.Bubble);
                   if (result) {
-                    var path = _photoDir;
+                    var path = _videoDir;
                     Fluttertoast.showToast(
                         msg: "Files are being deleted...",
                         toastLength: Toast.LENGTH_SHORT,
@@ -229,7 +228,7 @@ class _FileScreenState extends State<FileScreen> {
                         topLeft: Radius.circular(24.0),
                         topRight: Radius.circular(24.0),
                       )))),
-          body: _photoDir == null
+          body: _videoDir == null
               ? Center(
                   child: SpinKitFadingGrid(
                   color: AppTheme.appIndigo,
@@ -243,8 +242,8 @@ class _FileScreenState extends State<FileScreen> {
                         height: MediaQuery.of(context).size.height -
                             (AppBar().preferredSize.height + 40 + 60) * 1.1,
                         child: isLocal
-                            ? imageGrid(_photoDir)
-                            : cloudImageGrid(_photoDir),
+                            ? VideoGrid(_videoDir)
+                            : cloudImageGrid(_videoDir),
                       ),
                     )),
     );
@@ -262,21 +261,21 @@ class _FileScreenState extends State<FileScreen> {
       // check if the base directory exists for the app
       var exists = await Directory(myImagePath).exists();
       if (exists) {
-        _photoDir = myImagePath;
+        _videoDir = myImagePath;
       } else {
         // first time, create base directory
         await new Directory(myImagePath).create(recursive: true);
-        _photoDir = myImagePath;
+        _videoDir = myImagePath;
       }
     } else {
-      _photoDir = 'cloud';
+      _videoDir = 'cloud';
     }
     setState(() {});
   }
 
   void updateDir(String dir) {
     setState(() {
-      _photoDir = dir;
+      _videoDir = dir;
     });
   }
 
@@ -284,15 +283,9 @@ class _FileScreenState extends State<FileScreen> {
   void delete(var path) async {
     updateDir(null);
     if (isLocal) {
-      if (path.endsWith('.jpg')) {
-        File file = new File(path);
-        await file.delete();
-      } else {
-        Directory dir = new Directory(path);
-        await dir.delete(recursive: true);
-
-        isLocal = null;
-      }
+      Directory dir = new Directory(path);
+      await dir.delete(recursive: true);
+      isLocal = null;
     } else {
       await Backend.deleteFile(path);
     }
@@ -301,20 +294,21 @@ class _FileScreenState extends State<FileScreen> {
     subdirs.removeLast();
   }
 
-  Widget imageGrid(String directory) {
+  // TODO be careful of this directory variable
+  Widget VideoGrid(String directory) {
     var dir = new Directory(directory);
-    var imageList =
+    var videoList =
         dir.listSync().map((item) => item.path).toList(growable: false);
 
-    if (imageList.isNotEmpty) {
-      imageList.sort((b, a) => a.compareTo(b));
+    if (videoList.isNotEmpty) {
+      videoList.sort((b, a) => a.compareTo(b));
     }
 
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Container(
         color: AppTheme.nearlyWhite,
-        child: imageList.isEmpty
+        child: videoList.isEmpty
             ? Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
@@ -339,16 +333,14 @@ class _FileScreenState extends State<FileScreen> {
                   shrinkWrap: true,
                   controller: controller,
                   physics: BouncingScrollPhysics(),
-                  itemCount: imageList.length,
+                  itemCount: videoList.length,
                   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 3),
                   itemBuilder: (context, index) {
-                    List filePath = imageList[index].split('/');
+                    List filePath = videoList[index].split('/');
                     String name = filePath.last;
                     String folderName = name;
-                    if (name.endsWith('.jpg')) {
-                      folderName = filePath[filePath.length - 2];
-                    }
+
                     return FocusedMenuHolder(
                       menuWidth: MediaQuery.of(context).size.width * 0.50,
                       blurSize: 5.0,
@@ -364,77 +356,13 @@ class _FileScreenState extends State<FileScreen> {
                       menuOffset: 10.0,
                       bottomOffsetHeight: 80.0,
                       menuItems: <FocusedMenuItem>[
-                        if (name.endsWith('.jpg') || name.endsWith('.mp4')) ...[
-                          FocusedMenuItem(
-                              title: Text("Share"),
-                              trailingIcon: Icon(Icons.share),
-                              onPressed: () {
-                                var text = dateToString(name);
-                                Share.shareFiles([imageList[index]],
-                                    text: text);
-                              })
-                        ] else ...[
-                          FocusedMenuItem(
-                              title: Text("Create Video"),
-                              trailingIcon: Icon(Icons.video_call_rounded),
-                              onPressed: () async {
-                                await CustomProgressDialog.future(context,
-                                    future: _flutterFFmpeg.execute(
-                                      ' -start_number 1 -framerate 12 -i ${imageList[index]}/image_${name}_%4d.jpg -vf "scale=1920:1080:force_original_aspect_ratio=decrease,pad=1920:1080:(ow-iw)/2:(oh-ih)/2,setsar=1" ${imageList[index]}/video.mp4 -r 24 -y',
-                                    ),
-                                    loadingWidget: Center(
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.center,
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          SpinKitCubeGrid(
-                                            color: AppTheme.appIndigo,
-                                          ),
-                                          Padding(
-                                            padding: const EdgeInsets.all(8.0),
-                                            child: Text(
-                                              'Creating...',
-                                              style: AppTheme.title,
-                                            ),
-                                          )
-                                        ],
-                                      ),
-                                    ),
-                                    backgroundColor:
-                                        Colors.grey.withOpacity(.5),
-                                    blur: 2.0,
-                                    dismissable: false);
-                              }),
-                          FocusedMenuItem(
-                              title: Text("Backup data"),
-                              trailingIcon: Icon(Icons.cloud_upload_rounded),
-                              onPressed: () async {
-                                var imagesDir = new Directory(imageList[index]);
-                                var imagePaths = imagesDir
-                                    .listSync()
-                                    .map((item) => item.path)
-                                    .toList(growable: false);
-                                if (imagePaths.isNotEmpty) {
-                                  // get root dir id
-                                  Fluttertoast.showToast(
-                                      msg: "Files are being uploaded...",
-                                      toastLength: Toast.LENGTH_SHORT,
-                                      gravity: ToastGravity.CENTER,
-                                      timeInSecForIosWeb: 1,
-                                      backgroundColor: AppTheme.notWhite,
-                                      textColor: AppTheme.appIndigo,
-                                      fontSize: 16.0);
-                                }
-                                // loop the list and upload each file
-                                for (var path in imagePaths) {
-                                  await Backend.uploadFile(
-                                      File(path), folderName);
-                                }
-                                // TODO update folders count
-                              })
-                        ],
+                        FocusedMenuItem(
+                            title: Text("Share"),
+                            trailingIcon: Icon(Icons.share),
+                            onPressed: () {
+                              var text = dateToString(name);
+                              Share.shareFiles([videoList[index]], text: text);
+                            }),
                         FocusedMenuItem(
                             title: Text(
                               "Delete",
@@ -469,8 +397,8 @@ class _FileScreenState extends State<FileScreen> {
                                   transitionType: DialogTransitionType.Bubble);
                               if (result) {
                                 // Adds current dir, then force to null to trigger loading animation. After deletion current directory is reloaded
-                                subdirs.add(_photoDir);
-                                delete(imageList[index]);
+                                subdirs.add(_videoDir);
+                                delete(videoList[index]);
                               } else {
                                 print('else');
                               }
@@ -483,85 +411,58 @@ class _FileScreenState extends State<FileScreen> {
                           borderRadius: BorderRadius.circular(8.0),
                         ),
                         child: InkWell(
-                          onTap: () => {
-                            imageList[index].endsWith('.jpg') ||
-                                    imageList[index].endsWith('.mp4')
-                                ? {
-                                    subdirs.add('photo'),
-                                    Navigator.of(context)
-                                        .push(MaterialPageRoute(
-                                            builder: (context) => PhotoScreen(
-                                                imageList, index, isLocal)))
-                                        .then((value) {
-                                      if (value == 'pop') {
-                                        subdirs.removeLast();
-                                      } else if (value == 'delete') {
-                                        subdirs.removeLast();
-                                        subdirs.add(_photoDir);
-                                        delete(imageList[index]);
-                                      }
-                                    })
-                                  }
-                                : {
-                                    subdirs.add(_photoDir),
-                                    updateDir(imageList[index])
-                                  }
-                          },
-                          child: imageList[index].endsWith('.jpg')
-                              ? ClipRRect(
-                                  borderRadius: BorderRadius.circular(8.0),
-                                  child: Image.file(
-                                    File(imageList[index]),
-                                    fit: BoxFit.cover,
-                                  ),
-                                )
-                              : imageList[index].endsWith('.mp4')
-                                  ? ClipRRect(
-                                      borderRadius: BorderRadius.circular(8.0),
-                                      child: Stack(
-                                        fit: StackFit.expand,
-                                        children: [
-                                          Image.file(
-                                            index == imageList.length - 1
-                                                ? File(imageList[index - 1])
-                                                : File(imageList[index + 1]),
-                                            fit: BoxFit.fill,
-                                          ),
-                                          Center(
-                                            child: CircleAvatar(
-                                              backgroundColor:
-                                                  Colors.white.withOpacity(0.8),
-                                              radius: 25,
-                                              child: Icon(
-                                                Icons.play_circle_fill_rounded,
-                                                size: 50,
-                                                color: Colors.blueGrey
-                                                    .withOpacity(0.8),
-                                              ),
-                                            ),
-                                          ),
-                                        ],
+                            onTap: () => {
+                                  videoList[index].endsWith('.mp4')
+                                      ? {
+                                          subdirs.add('photo'),
+                                          Navigator.of(context)
+                                              .push(MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      VideoScreen(
+                                                          videoList[index],
+                                                          isLocal)))
+                                              .then((value) {
+                                            if (value == 'pop') {
+                                              subdirs.removeLast();
+                                            } else if (value == 'delete') {
+                                              subdirs.removeLast();
+                                              subdirs.add(_videoDir);
+                                              delete(videoList[index]);
+                                            }
+                                          })
+                                        }
+                                      : {
+                                          subdirs.add(_videoDir),
+                                          updateDir(videoList[index])
+                                        }
+                                },
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(8.0),
+                              child: Stack(
+                                fit: StackFit.expand,
+                                children: [
+                                  // Image.file(
+                                  //   // TODO thumbnail
+                                  //   index == imageList.length - 1
+                                  //       ? File(imageList[index - 1])
+                                  //       : File(imageList[index + 1]),
+                                  //   fit: BoxFit.fill,
+                                  // ),
+                                  Center(
+                                    child: CircleAvatar(
+                                      backgroundColor:
+                                          Colors.white.withOpacity(0.8),
+                                      radius: 25,
+                                      child: Icon(
+                                        Icons.play_circle_fill_rounded,
+                                        size: 50,
+                                        color: Colors.blueGrey.withOpacity(0.8),
                                       ),
-                                    )
-                                  : Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                          Icon(
-                                            Icons.perm_media_outlined,
-                                            color: AppTheme.appIndigo,
-                                            size: 50,
-                                          ),
-                                          Padding(
-                                            padding: const EdgeInsets.all(8.0),
-                                            child: Text(
-                                              dateToString(name),
-                                              style: AppTheme.body1,
-                                              textAlign: TextAlign.center,
-                                            ),
-                                          )
-                                        ]),
-                        ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            )),
                       ),
                     );
                   },
@@ -588,7 +489,7 @@ class _FileScreenState extends State<FileScreen> {
                 onTap: () => {
                   subdirs.add('root'),
                   setState(() {
-                    _photoDir = null;
+                    _videoDir = null;
                     isLocal = true;
                   }),
                   getDir()
@@ -651,7 +552,7 @@ class _FileScreenState extends State<FileScreen> {
                     {
                       subdirs.add('root'),
                       setState(() {
-                        _photoDir = null;
+                        _videoDir = null;
                         isLocal = false;
                       }),
                       getDir()
@@ -691,6 +592,7 @@ class _FileScreenState extends State<FileScreen> {
   }
 
   Widget cloudImageGrid(String dir) {
+    // TODO somehow separate videos by device, might need to change cloud layout
     List directory;
     Map results;
     return FutureBuilder(
@@ -772,18 +674,9 @@ class _FileScreenState extends State<FileScreen> {
                                           textColor: AppTheme.appIndigo,
                                           fontSize: 16.0);
 
-                                      if (directory[index].endsWith('.jpg') ||
-                                          directory[index].endsWith('.mp4')) {
+                                      if (directory[index].endsWith('.mp4')) {
                                         await ImageDownloader.downloadImage(
                                             results[directory[index]]);
-                                      } else {
-                                        List files = results[directory[index]]
-                                            .values
-                                            .toList();
-                                        for (var file in files) {
-                                          await ImageDownloader.downloadImage(
-                                              file);
-                                        }
                                       }
                                     }),
                                 FocusedMenuItem(
@@ -821,7 +714,7 @@ class _FileScreenState extends State<FileScreen> {
                                               DialogTransitionType.Bubble);
                                       if (result) {
                                         // Add current dir, then force to null to trigger loading animation. After deletion current directory is reloaded
-                                        subdirs.add(_photoDir);
+                                        subdirs.add(_videoDir);
                                         delete(results[directory[index]]);
                                       } else {
                                         print('else');
@@ -835,105 +728,60 @@ class _FileScreenState extends State<FileScreen> {
                                   borderRadius: BorderRadius.circular(8.0),
                                 ),
                                 child: InkWell(
-                                  onTap: () => {
-                                    directory[index].endsWith('.jpg') ||
-                                            directory[index].endsWith('.mp4')
-                                        ? {
-                                            subdirs.add('photo'),
-                                            Navigator.of(context)
-                                                .push(MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        PhotoScreen(results,
-                                                            index, isLocal)))
-                                                .then((value) {
-                                              if (value == 'pop') {
-                                                subdirs.removeLast();
-                                              } else if (value == 'delete') {
-                                                subdirs.removeLast();
-                                                subdirs.add(_photoDir);
-                                                delete(directory[index]);
-                                              }
-                                            })
-                                          }
-                                        : {
-                                            subdirs.add(_photoDir),
-                                            updateDir(directory[index])
-                                          }
-                                  },
-                                  child: directory[index].endsWith('.jpg')
-                                      ? ClipRRect(
-                                          borderRadius:
-                                              BorderRadius.circular(8.0),
-                                          child: CachedNetworkImage(
-                                              imageUrl:
-                                                  results[directory[index]],
-                                              fit: BoxFit.cover,
-                                              progressIndicatorBuilder:
-                                                  (context, url,
-                                                          downloadProgress) =>
-                                                      SizedBox(
-                                                        height: 10,
-                                                        width: 10,
-                                                        child: Center(
-                                                          child: CircularProgressIndicator(
-                                                              value:
-                                                                  downloadProgress
-                                                                      .progress),
-                                                        ),
-                                                      )),
-                                        )
-                                      : directory[index].endsWith('.mp4')
-                                          ? ClipRRect(
-                                              borderRadius:
-                                                  BorderRadius.circular(8.0),
-                                              child: Stack(
-                                                fit: StackFit.expand,
-                                                children: [
-                                                  Image.network(
-                                                    results[directory[1]],
-                                                    fit: BoxFit.cover,
-                                                  ),
-                                                  Center(
-                                                    child: CircleAvatar(
-                                                      backgroundColor: Colors
-                                                          .white
-                                                          .withOpacity(0.8),
-                                                      radius: 25,
-                                                      child: Icon(
-                                                        Icons
-                                                            .play_circle_fill_rounded,
-                                                        size: 50,
-                                                        color: Colors.blueGrey
-                                                            .withOpacity(0.8),
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ],
+                                    onTap: () => {
+                                          directory[index].endsWith('.mp4')
+                                              ? {
+                                                  subdirs.add('photo'),
+                                                  Navigator.of(context)
+                                                      .push(MaterialPageRoute(
+                                                          builder: (context) =>
+                                                              VideoScreen(
+                                                                  results[
+                                                                      directory[
+                                                                          index]],
+                                                                  isLocal)))
+                                                      .then((value) {
+                                                    if (value == 'pop') {
+                                                      subdirs.removeLast();
+                                                    } else if (value ==
+                                                        'delete') {
+                                                      subdirs.removeLast();
+                                                      subdirs.add(_videoDir);
+                                                      delete(directory[index]);
+                                                    }
+                                                  })
+                                                }
+                                              : {
+                                                  subdirs.add(_videoDir),
+                                                  updateDir(directory[index])
+                                                }
+                                        },
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(8.0),
+                                      child: Stack(
+                                        fit: StackFit.expand,
+                                        children: [
+                                          // Image.network(
+                                          //   // TODO thumbnail
+                                          //   results[directory[1]],
+                                          //   fit: BoxFit.cover,
+                                          // ),
+                                          Center(
+                                            child: CircleAvatar(
+                                              backgroundColor:
+                                                  Colors.white.withOpacity(0.8),
+                                              radius: 25,
+                                              child: Icon(
+                                                Icons.play_circle_fill_rounded,
+                                                size: 50,
+                                                color: Colors.blueGrey
+                                                    .withOpacity(0.8),
                                               ),
-                                            )
-                                          : Column(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              children: [
-                                                  Icon(
-                                                    Icons.perm_media_outlined,
-                                                    color: AppTheme.appIndigo,
-                                                    size: 50,
-                                                  ),
-                                                  Padding(
-                                                    padding:
-                                                        const EdgeInsets.all(
-                                                            8.0),
-                                                    child: Text(
-                                                      dateToString(
-                                                          directory[index]),
-                                                      style: AppTheme.body1,
-                                                      textAlign:
-                                                          TextAlign.center,
-                                                    ),
-                                                  )
-                                                ]),
-                                ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    )),
                               ),
                             );
                           },
