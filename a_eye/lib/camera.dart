@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:a_eye/backend.dart';
 import 'package:a_eye/label_map.dart';
 import 'package:flutter/material.dart';
@@ -75,11 +74,24 @@ class _CameraState extends State<Camera> {
 
   @override
   void dispose() {
-    // Future.delayed(Duration.zero, () async {
-    //   await controller?.dispose();
-    // });
+    // TODO maybe check current cooldown and makeMovie() here
     controller?.dispose();
     super.dispose();
+    // if (subdir != null && !widget.model) {
+    //   Future.delayed(Duration.zero, () async {
+    //     var directory;
+    //     if (Platform.isIOS) {
+    //       directory = await getApplicationDocumentsDirectory();
+    //     } else {
+    //       directory = await getExternalStorageDirectory();
+    //     }
+
+    //     final myImagePath = '${directory.path}/Shots/$subdir';
+    //     final myVideoPath = '${directory.path}/Shots';
+    //     makeMovie(myImagePath, myVideoPath, subdir);
+    //     subdir = null;
+    //   });
+    // }
   }
 
   @override
