@@ -276,8 +276,10 @@ class _CameraState extends State<Camera> {
                 } else {
                   directory = await getExternalStorageDirectory();
                 }
+
                 final myImagePath = '${directory.path}/Shots/$subdir';
-                makeMovie(myImagePath, subdir);
+                final myVideoPath = '${directory.path}/Shots';
+                makeMovie(myImagePath, myVideoPath, subdir);
                 subdir = null;
               }
             }
@@ -292,8 +294,10 @@ class _CameraState extends State<Camera> {
           } else {
             directory = await getExternalStorageDirectory();
           }
+
           final myImagePath = '${directory.path}/Shots/$subdir';
-          makeMovie(myImagePath, subdir);
+          final myVideoPath = '${directory.path}/Shots';
+          makeMovie(myImagePath, myVideoPath, subdir);
           subdir = null;
         }
       });
@@ -316,6 +320,7 @@ class _CameraState extends State<Camera> {
     }
     final myImagePath = '${directory.path}/Shots/$subdir';
     await new Directory(myImagePath).create(recursive: true);
+    final myVideoPath = '${directory.path}/Shots';
     imglib.Image file;
 
     try {
@@ -382,7 +387,7 @@ class _CameraState extends State<Camera> {
     if (imageCount > 999) {
       // if an object is captured for a lengthy period of time, a new directory is automatically created
       imageCount = 1;
-      makeMovie(myImagePath, subdir);
+      makeMovie(myImagePath, myImagePath, subdir);
       subdir = formatDate.format(DateTime.now());
     }
     var write = new File("$myImagePath/image_$name.jpg")
@@ -391,33 +396,31 @@ class _CameraState extends State<Camera> {
   }
 
   // ignore: missing_return
-  Future makeMovie(String myImagePath, String subdir) {
+  Future makeMovie(String myImagePath, String myVideoPath, String subdir) {
     if (subdir != null) {
       _flutterFFmpeg
           .execute(
-            ' -start_number 1 -framerate 12 -i $myImagePath/image_${subdir}_%4d.jpg -vf "scale=1920:1080:force_original_aspect_ratio=decrease,pad=1920:1080:(ow-iw)/2:(oh-ih)/2,setsar=1" $myImagePath/video.mp4 -r 24 -y',
+            ' -start_number 1 -framerate 12 -i $myImagePath/image_${subdir}_%4d.jpg -vf "scale=1920:1080:force_original_aspect_ratio=decrease,pad=1920:1080:(ow-iw)/2:(oh-ih)/2,setsar=1" $myVideoPath/$subdir.mp4 -r 24 -y',
           )
           .then((value) async => {
                 if (Settings.getValue('drive', false))
-                  {cloudSync(myImagePath, subdir)}
+                  {cloudSync(myImagePath, '$myVideoPath/$subdir', subdir)}
               });
     }
   }
 
-// TODO this needs to change. Delete all photos from their folder, upload Video to different folder.
-  Future cloudSync(String myImagePath, String subdir) async {
+  Future cloudSync(
+      String myImagePath, String myVideoPath, String subdir) async {
     var dir = new Directory(myImagePath);
     var imageList =
         dir.listSync().map((item) => item.path).toList(growable: false);
     if (imageList.isNotEmpty) {
-      // loop the list and upload each file
-      for (var path in imageList) {
-        await Backend.uploadFile(File(path), subdir);
-      }
-
-      if (Settings.getValue('onlycloud', false)) {
-        await dir.delete(recursive: true);
-      }
+      await dir.delete(recursive: true);
+    }
+    await Backend.uploadFile(File(myVideoPath), subdir);
+    if (Settings.getValue('onlycloud', false)) {
+      var dir = new Directory(myVideoPath);
+      await dir.delete(recursive: true);
     }
   }
 
