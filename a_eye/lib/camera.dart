@@ -417,7 +417,7 @@ class _CameraState extends State<Camera> {
     if (imageList.isNotEmpty) {
       await dir.delete(recursive: true);
     }
-    await Backend.uploadFile(File(myVideoPath), subdir);
+    await Backend.uploadFile(File(myVideoPath));
     if (Settings.getValue('onlycloud', false)) {
       var dir = new Directory(myVideoPath);
       await dir.delete(recursive: true);
