@@ -14,7 +14,6 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:focused_menu/focused_menu.dart';
 import 'package:focused_menu/modals.dart';
-import 'package:image_downloader/image_downloader.dart';
 import 'package:ndialog/ndialog.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
@@ -674,10 +673,11 @@ class _FileScreenState extends State<FileScreen> {
                                           textColor: AppTheme.appIndigo,
                                           fontSize: 16.0);
 
-                                      if (directory[index].endsWith('.mp4')) {
-                                        await ImageDownloader.downloadImage(
-                                            results[directory[index]]);
-                                      }
+                                      // TODO add another downloader option
+                                      // if (directory[index].endsWith('.mp4')) {
+                                      //   await ImageDownloader.downloadImage(
+                                      //       results[directory[index]]);
+                                      // }
                                     }),
                                 FocusedMenuItem(
                                     title: Text(
