@@ -404,6 +404,7 @@ class _CameraState extends State<Camera> {
     }
   }
 
+// TODO this needs to change. Delete all photos from their folder, upload Video to different folder.
   Future cloudSync(String myImagePath, String subdir) async {
     var dir = new Directory(myImagePath);
     var imageList =

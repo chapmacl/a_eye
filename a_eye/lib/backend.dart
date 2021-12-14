@@ -111,7 +111,7 @@ class Backend {
     QuerySnapshot q = await firestore
         .collection('users')
         .doc(user.uid)
-        .collection('photos')
+        .collection('captures')
         .get();
     Map results = {};
     q.docs.forEach((doc) {
@@ -124,7 +124,7 @@ class Backend {
     DocumentSnapshot q = await firestore
         .collection('users')
         .doc(user.uid)
-        .collection('photos')
+        .collection('captures')
         .doc(dir)
         .get();
     return q.get('urls');
@@ -135,7 +135,7 @@ class Backend {
     DocumentSnapshot q = await firestore
         .collection('users')
         .doc(user.uid)
-        .collection('photos')
+        .collection('captures')
         .doc(path)
         .get();
     return q.exists;
@@ -149,7 +149,7 @@ class Backend {
     var photo = firestore
         .collection('users')
         .doc(user.uid)
-        .collection('photos')
+        .collection('captures')
         .doc(parent_dir);
     await photo.set({
       'urls': {path.basename(file.absolute.path): url}
@@ -159,13 +159,13 @@ class Backend {
   }
 
   static Future deleteFile(var path) async {
-    if (path.contains('.jpg') || path.contains('.mp4')) {
+    if (path.contains('.mp4')) {
       var parts = path.split('_');
       var parent = '${parts[1]}_${parts[2]}';
       var photo = await firestore
           .collection('users')
           .doc(user.uid)
-          .collection('photos')
+          .collection('captures')
           .doc(parent);
       var q = await photo.get();
       var url = q.get('urls')[path];
@@ -177,7 +177,7 @@ class Backend {
       var photo = await firestore
           .collection('users')
           .doc(user.uid)
-          .collection('photos')
+          .collection('captures')
           .doc(path);
       var q = await photo.get();
       var urls = q.get('urls').values.toList();
