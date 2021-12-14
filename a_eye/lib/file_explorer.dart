@@ -165,6 +165,11 @@ class _FileScreenState extends State<FileScreen> {
           controller: _pc,
           minHeight: isLocal == true ? 0 : 40,
           maxHeight: MediaQuery.of(context).size.height * 0.3,
+          backdropEnabled: true,
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(24.0),
+            topRight: Radius.circular(24.0),
+          ),
           panel: Padding(
             padding: const EdgeInsets.only(left: 16, right: 16),
             child: Column(
@@ -235,7 +240,6 @@ class _FileScreenState extends State<FileScreen> {
                   : Align(
                       alignment: Alignment.topLeft,
                       child: Container(
-                        // TODO find correct height for this (might be magic number)
                         height: MediaQuery.of(context).size.height -
                             (AppBar().preferredSize.height + 40 + 60) * 1.1,
                         child: isLocal
