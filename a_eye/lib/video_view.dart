@@ -122,7 +122,9 @@ class _VideoScreenState extends State<VideoScreen>
             )
           ],
         ),
-        body: FutureBuilder(
+        body:
+            // TODO maybe bring back Photoview, for pinch zoom
+            FutureBuilder(
           future: _initializeVideoPlayerFuture,
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.done) {
