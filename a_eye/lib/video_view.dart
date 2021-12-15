@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:a_eye/app_theme.dart';
 import 'package:a_eye/string_functions.dart';
 import 'package:flutter/material.dart';
@@ -56,7 +58,9 @@ class _VideoScreenState extends State<VideoScreen>
   @override
   Widget build(BuildContext context) {
     String name;
-    _controller = VideoPlayerController.network(video_url);
+    _controller = isLocal
+        ? VideoPlayerController.file(File(video_url))
+        : VideoPlayerController.network(video_url);
     Future _initializeVideoPlayerFuture = _controller.initialize();
     name = isLocal ? video_url.split('/').last : video_url;
     return Scaffold(
