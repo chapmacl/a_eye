@@ -293,7 +293,6 @@ class _FileScreenState extends State<FileScreen> {
     subdirs.removeLast();
   }
 
-  // TODO be careful of this directory variable
   Widget VideoGrid(String directory) {
     var dir = new Directory(directory);
     var videoList =
@@ -426,6 +425,7 @@ class _FileScreenState extends State<FileScreen> {
                         onPressed: () {},
                         child:
                             // TODO display names under video
+                            // TODO ignore any folders here, since this is local
                             Card(
                           elevation: 4,
                           shape: RoundedRectangleBorder(
@@ -433,6 +433,7 @@ class _FileScreenState extends State<FileScreen> {
                           ),
                           child: InkWell(
                               onTap: () => {
+                                    // TODO probably safe to assume there are only mp4
                                     videoList[index].endsWith('.mp4')
                                         ? {
                                             subdirs.add('photo'),
@@ -462,6 +463,7 @@ class _FileScreenState extends State<FileScreen> {
                                 child: Stack(
                                   fit: StackFit.expand,
                                   children: [
+                                    // TODO this
                                     // imageBytes != null
                                     //     ? Image.memory(
                                     //         imageBytes,

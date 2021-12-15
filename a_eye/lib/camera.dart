@@ -4,7 +4,6 @@ import 'package:a_eye/label_map.dart';
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_ffmpeg/flutter_ffmpeg.dart';
 import 'package:flutter_settings_screens/flutter_settings_screens.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:intl/intl.dart';
@@ -43,7 +42,6 @@ class Camera extends StatefulWidget {
 
 class _CameraState extends State<Camera> {
   CameraController controller;
-  final FlutterFFmpeg _flutterFFmpeg = new FlutterFFmpeg();
   bool isDetecting = false;
   imglib.JpegEncoder encoder = new imglib.JpegEncoder(quality: 60);
   DateFormat formatDate = new DateFormat('yyyy-MM-dd_HH:mm');
@@ -77,21 +75,21 @@ class _CameraState extends State<Camera> {
     // TODO maybe check current cooldown and makeMovie() here
     controller?.dispose();
     super.dispose();
-    // if (subdir != null && !widget.model) {
-    //   Future.delayed(Duration.zero, () async {
-    //     var directory;
-    //     if (Platform.isIOS) {
-    //       directory = await getApplicationDocumentsDirectory();
-    //     } else {
-    //       directory = await getExternalStorageDirectory();
-    //     }
+    if (subdir != null && !widget.model) {
+      Future.delayed(Duration.zero, () async {
+        var directory;
+        if (Platform.isIOS) {
+          directory = await getApplicationDocumentsDirectory();
+        } else {
+          directory = await getExternalStorageDirectory();
+        }
 
-    //     final myImagePath = '${directory.path}/Shots/$subdir';
-    //     final myVideoPath = '${directory.path}/Shots';
-    //     makeMovie(myImagePath, myVideoPath, subdir);
-    //     subdir = null;
-    //   });
-    // }
+        final myImagePath = '${directory.path}/Shots/$subdir';
+        final myVideoPath = '${directory.path}/Shots';
+        Backend.makeMovie(myImagePath, myVideoPath, subdir);
+        subdir = null;
+      });
+    }
   }
 
   @override
@@ -291,7 +289,7 @@ class _CameraState extends State<Camera> {
 
                 final myImagePath = '${directory.path}/Shots/$subdir';
                 final myVideoPath = '${directory.path}/Shots';
-                makeMovie(myImagePath, myVideoPath, subdir);
+                Backend.makeMovie(myImagePath, myVideoPath, subdir);
                 subdir = null;
               }
             }
@@ -309,7 +307,7 @@ class _CameraState extends State<Camera> {
 
           final myImagePath = '${directory.path}/Shots/$subdir';
           final myVideoPath = '${directory.path}/Shots';
-          makeMovie(myImagePath, myVideoPath, subdir);
+          Backend.makeMovie(myImagePath, myVideoPath, subdir);
           subdir = null;
         }
       });
@@ -402,41 +400,12 @@ class _CameraState extends State<Camera> {
     if (imageCount > 999) {
       // if an object is captured for a lengthy period of time, a new directory is automatically created
       imageCount = 1;
-      makeMovie(myImagePath, myImagePath, subdir);
+      Backend.makeMovie(myImagePath, myImagePath, subdir);
       subdir = formatDate.format(DateTime.now());
     }
     var write = new File("$myImagePath/image_$name.jpg")
       ..writeAsBytesSync(jpeg);
     print(write.path);
-  }
-
-  // ignore: missing_return
-  Future makeMovie(String myImagePath, String myVideoPath, String subdir) {
-    if (subdir != null) {
-      _flutterFFmpeg
-          .execute(
-            ' -start_number 1 -framerate 12 -i $myImagePath/image_${subdir}_%4d.jpg -vf "scale=1920:1080:force_original_aspect_ratio=decrease,pad=1920:1080:(ow-iw)/2:(oh-ih)/2,setsar=1" $myVideoPath/$subdir.mp4 -r 24 -y',
-          )
-          .then((value) async => {
-                if (Settings.getValue('drive', false))
-                  {cloudSync(myImagePath, '$myVideoPath/$subdir', subdir)}
-              });
-    }
-  }
-
-  Future cloudSync(
-      String myImagePath, String myVideoPath, String subdir) async {
-    var dir = new Directory(myImagePath);
-    var imageList =
-        dir.listSync().map((item) => item.path).toList(growable: false);
-    if (imageList.isNotEmpty) {
-      await dir.delete(recursive: true);
-    }
-    await Backend.uploadFile(File(myVideoPath));
-    if (Settings.getValue('onlycloud', false)) {
-      var dir = new Directory(myVideoPath);
-      await dir.delete(recursive: true);
-    }
   }
 
   imglib.Image _convertBGRA8888(CameraImage image) {

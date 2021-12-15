@@ -11,6 +11,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_settings_screens/flutter_settings_screens.dart'
     as settings;
+import 'package:flutter_ffmpeg/flutter_ffmpeg.dart';
 
 class Backend {
   static FirebaseAuth auth = FirebaseAuth.instance;
@@ -19,6 +20,7 @@ class Backend {
   static GoogleSignIn googleSignIn = GoogleSignIn();
   static GoogleSignInAccount googleSignInAccount;
   static User user = auth.currentUser;
+  static FlutterFFmpeg _flutterFFmpeg = new FlutterFFmpeg();
 
   static Future<FirebaseApp> initializeFirebase({
     BuildContext context,
@@ -118,6 +120,36 @@ class Backend {
       results[doc.id] = doc.get('urls');
     });
     return results;
+  }
+
+  // ignore: missing_return
+  static Future makeMovie(
+      String myImagePath, String myVideoPath, String subdir) {
+    if (subdir != null) {
+      _flutterFFmpeg
+          .execute(
+            ' -start_number 1 -framerate 12 -i $myImagePath/image_${subdir}_%4d.jpg -vf "scale=1920:1080:force_original_aspect_ratio=decrease,pad=1920:1080:(ow-iw)/2:(oh-ih)/2,setsar=1" $myVideoPath/$subdir.mp4 -r 24 -y',
+          )
+          .then((value) async => {
+                if (settings.Settings.getValue('drive', false))
+                  {cloudSync(myImagePath, '$myVideoPath/$subdir', subdir)}
+              });
+    }
+  }
+
+  static Future cloudSync(
+      String myImagePath, String myVideoPath, String subdir) async {
+    var dir = new Directory(myImagePath);
+    var imageList =
+        dir.listSync().map((item) => item.path).toList(growable: false);
+    if (imageList.isNotEmpty) {
+      await dir.delete(recursive: true);
+    }
+    await Backend.uploadFile(File(myVideoPath));
+    if (settings.Settings.getValue('onlycloud', false)) {
+      var dir = new Directory(myVideoPath);
+      await dir.delete(recursive: true);
+    }
   }
 
   static Future getFiles(String dir) async {
