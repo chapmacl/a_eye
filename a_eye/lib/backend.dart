@@ -143,6 +143,7 @@ class Backend {
   }
 
   static Future cloudSync(String myVideoPath, String subdir) async {
+    await uploadFile(File(myVideoPath));
     if (settings.Settings.getValue('onlycloud', false)) {
       var dir = new Directory(myVideoPath);
       await dir.delete(recursive: true);
