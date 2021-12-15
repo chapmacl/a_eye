@@ -43,7 +43,8 @@ class Camera extends StatefulWidget {
 class _CameraState extends State<Camera> {
   CameraController controller;
   bool isDetecting = false;
-  imglib.JpegEncoder encoder = new imglib.JpegEncoder(quality: 60);
+  // TODO play with this quality number
+  imglib.JpegEncoder encoder = new imglib.JpegEncoder(quality: 80);
   DateFormat formatDate = new DateFormat('yyyy-MM-dd_HH:mm');
   NumberFormat formatNum = new NumberFormat("0000");
   int cooldown;
