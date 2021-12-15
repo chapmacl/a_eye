@@ -294,12 +294,27 @@ class _FileScreenState extends State<FileScreen> {
   }
 
   Widget VideoGrid(String directory) {
+    // TODO maybe a try catch, on error return to root grid and hope for the best
     var dir = new Directory(directory);
     var videoList =
         dir.listSync().map((item) => item.path).toList(growable: false);
 
+    var toBeRemoved =
+        videoList.where((element) => element.contains('null')).toList();
+
+    videoList =
+        videoList.where((element) => !element.contains('null')).toList();
+
     if (videoList.isNotEmpty) {
       videoList.sort((b, a) => a.compareTo(b));
+    }
+
+    // Fairly hacky solution. Sometimes folders will be leftover when switching
+    // between pages quickly. Must not let the user see them...
+    if (toBeRemoved.isNotEmpty) {
+      for (var directory in toBeRemoved) {
+        new Directory(directory).delete(recursive: true);
+      }
     }
 
     return Padding(
