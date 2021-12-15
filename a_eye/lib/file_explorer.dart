@@ -462,13 +462,12 @@ class _FileScreenState extends State<FileScreen> {
                                 child: Stack(
                                   fit: StackFit.expand,
                                   children: [
-                                    // Image.file(
-                                    //   // TODO thumbnail
-                                    //   index == imageList.length - 1
-                                    //       ? File(imageList[index - 1])
-                                    //       : File(imageList[index + 1]),
-                                    //   fit: BoxFit.fill,
-                                    // ),
+                                    // imageBytes != null
+                                    //     ? Image.memory(
+                                    //         imageBytes,
+                                    //         fit: BoxFit.fill,
+                                    //       )
+                                    //     : Container(),
                                     Center(
                                       child: CircleAvatar(
                                         backgroundColor:
