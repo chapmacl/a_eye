@@ -365,6 +365,23 @@ class _FileScreenState extends State<FileScreen> {
                                     text: text);
                               }),
                           FocusedMenuItem(
+                              title: Text("Backup data"),
+                              trailingIcon: Icon(Icons.cloud_upload_rounded),
+                              onPressed: () async {
+                                // get root dir id
+                                Fluttertoast.showToast(
+                                    msg: "Files are being uploaded...",
+                                    toastLength: Toast.LENGTH_SHORT,
+                                    gravity: ToastGravity.CENTER,
+                                    timeInSecForIosWeb: 1,
+                                    backgroundColor: AppTheme.notWhite,
+                                    textColor: AppTheme.appIndigo,
+                                    fontSize: 16.0);
+                                await Backend.uploadFile(
+                                    File(videoList[index]));
+                                // TODO update folders count
+                              }),
+                          FocusedMenuItem(
                               title: Text(
                                 "Delete",
                                 style: TextStyle(color: Colors.redAccent),
