@@ -125,27 +125,24 @@ class Backend {
   // ignore: missing_return
   static Future makeMovie(
       String myImagePath, String myVideoPath, String subdir) {
+    var dir;
     if (subdir != null) {
       _flutterFFmpeg
           .execute(
             ' -start_number 1 -framerate 12 -i $myImagePath/image_${subdir}_%4d.jpg -vf "scale=1920:1080:force_original_aspect_ratio=decrease,pad=1920:1080:(ow-iw)/2:(oh-ih)/2,setsar=1" $myVideoPath/$subdir.mp4 -r 24 -y',
           )
           .then((value) async => {
+                dir = new Directory(myImagePath),
+                await dir.delete(recursive: true),
                 if (settings.Settings.getValue('drive', false))
-                  {cloudSync(myImagePath, '$myVideoPath/$subdir', subdir)}
+                  {
+                    cloudSync('$myVideoPath/$subdir', subdir),
+                  }
               });
     }
   }
 
-  static Future cloudSync(
-      String myImagePath, String myVideoPath, String subdir) async {
-    var dir = new Directory(myImagePath);
-    var imageList =
-        dir.listSync().map((item) => item.path).toList(growable: false);
-    if (imageList.isNotEmpty) {
-      await dir.delete(recursive: true);
-    }
-    await Backend.uploadFile(File(myVideoPath));
+  static Future cloudSync(String myVideoPath, String subdir) async {
     if (settings.Settings.getValue('onlycloud', false)) {
       var dir = new Directory(myVideoPath);
       await dir.delete(recursive: true);
