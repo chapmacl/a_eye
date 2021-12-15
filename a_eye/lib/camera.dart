@@ -331,8 +331,10 @@ class _CameraState extends State<Camera> {
       directory = await getExternalStorageDirectory();
     }
     final myImagePath = '${directory.path}/Shots/$subdir';
-    await new Directory(myImagePath).create(recursive: true);
-    final myVideoPath = '${directory.path}/Shots';
+    bool exists = await Directory(myImagePath).exists();
+    if (!exists) {
+      await new Directory(myImagePath).create(recursive: true);
+    }
     imglib.Image file;
 
     try {
