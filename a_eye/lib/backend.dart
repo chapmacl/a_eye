@@ -193,12 +193,12 @@ class Backend {
         .child('${user.uid}/${parent_dir}/${path.basename(videoPath)}');
     await ref.putFile(File(videoPath));
     var url = await ref.getDownloadURL();
-    var photo = firestore
+    var video = firestore
         .collection('users')
         .doc(user.uid)
         .collection('captures')
         .doc(parent_dir);
-    await photo.set({
+    await video.set({
       'urls': {path.basename(videoPath): url}
     }, SetOptions(merge: true));
     print('uploaded file ' + videoPath);

@@ -48,15 +48,15 @@ String dateToString(String filename) {
   return prettyPrint;
 }
 
-String getTitle(String _photoDir) {
+String getTitle(String _videoDir) {
   String title;
-  if (_photoDir == null) {
+  if (_videoDir == null) {
     title = '';
-  } else if (_photoDir.endsWith('Shots')) {
+  } else if (_videoDir.endsWith('Shots')) {
     title = 'Internal Storage';
-  } else if (_photoDir.contains('/')) {
-    title = dateToString(_photoDir.split('/').last);
-  } else if (_photoDir.endsWith('cloud')) {
+  } else if (_videoDir.contains('/')) {
+    title = dateToString(_videoDir.split('/').last);
+  } else if (_videoDir.endsWith('cloud')) {
     title = 'Cloud Storage';
   } else {
     title = '';

@@ -43,7 +43,7 @@ class _FileScreenState extends State<FileScreen> {
     if (subdirs.length > 0) {
       var last = subdirs.last;
       subdirs.removeLast();
-      if (last == 'photo') {
+      if (last == 'video') {
         return false;
       } else if (last == 'root') {
         setState(() {
@@ -64,7 +64,7 @@ class _FileScreenState extends State<FileScreen> {
     if (subdirs.length > 0) {
       var last = subdirs.last;
       subdirs.removeLast();
-      if (last == 'photo') {
+      if (last == 'video') {
         Navigator.pop(context);
       } else if (last == 'root') {
         setState(() {
@@ -121,7 +121,7 @@ class _FileScreenState extends State<FileScreen> {
                   bool result = await DialogBackground(
                     blur: 2.0,
                     dialog: AlertDialog(
-                      title: Text("Delete all photos"),
+                      title: Text("Delete all Videos"),
                       content: Text("Are you sure?"),
                       actions: <Widget>[
                         TextButton(
@@ -332,7 +332,7 @@ class _FileScreenState extends State<FileScreen> {
                       color: AppTheme.appIndigo,
                     ),
                     Text(
-                      "No Photos yet...",
+                      "No Videos yet...",
                       style: AppTheme.title2,
                     )
                   ],
@@ -461,7 +461,7 @@ class _FileScreenState extends State<FileScreen> {
                               onTap: () => {
                                     videoList[index].endsWith('.mp4')
                                         ? {
-                                            subdirs.add('photo'),
+                                            subdirs.add('video'),
                                             Navigator.of(context)
                                                 .push(MaterialPageRoute(
                                                     builder: (context) =>
@@ -695,7 +695,7 @@ class _FileScreenState extends State<FileScreen> {
                               color: AppTheme.appIndigo,
                             ),
                             Text(
-                              "No Photos yet...",
+                              "No Videos yet...",
                               style: AppTheme.title2,
                             )
                           ],
@@ -802,7 +802,7 @@ class _FileScreenState extends State<FileScreen> {
                                       onTap: () => {
                                             directory[index].endsWith('.mp4')
                                                 ? {
-                                                    subdirs.add('photo'),
+                                                    subdirs.add('video'),
                                                     Navigator.of(context)
                                                         .push(MaterialPageRoute(
                                                             builder: (context) =>

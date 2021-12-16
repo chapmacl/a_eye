@@ -133,7 +133,7 @@ class _CameraScreenState extends State<CameraScreen>
                 dialog: AlertDialog(
                   title: Text("Storage"),
                   content: Text(
-                      "You need to allow storage permissions to save photos and video."),
+                      "You need to allow storage permissions to save videos."),
                   actions: <Widget>[
                     TextButton(
                       child: Text("Go to settings"),
@@ -267,9 +267,9 @@ class _CameraScreenState extends State<CameraScreen>
                       settingKey: 'onlycloud',
                       title: 'Only Cloud Storage',
                       enabledLabel:
-                          'Photos will only be stored in the cloud, and not on device.',
+                          'Videos will only be stored in the cloud, and not on device.',
                       disabledLabel:
-                          'Photos will be stored on device and in the cloud.',
+                          'Videos will be stored on device and in the cloud.',
                       leading: Icon(
                         Icons.folder_open_outlined,
                       ))
