@@ -149,7 +149,7 @@ class Backend {
   }
 
   static Future cloudSync(String myVideoPath, String subdir) async {
-    await uploadFile(File(myVideoPath), subdir);
+    await uploadFile(myVideoPath, subdir);
     if (settings.Settings.getValue('onlycloud', false)) {
       var dir = new Directory(myVideoPath);
       await dir.delete(recursive: true);
@@ -166,36 +166,43 @@ class Backend {
     return q.get('urls');
   }
 
-  static Future doesFileExist(String path) async {
+  static Future getUrlMap(String path) async {
     DocumentSnapshot q = await firestore
         .collection('users')
         .doc(user.uid)
         .collection('captures')
         .doc(path.split('_').first)
         .get();
-    return q.exists;
+    return q.data();
   }
 
-// TODO test this
-  static Future uploadFile(File file, String subdir) async {
-    String parent_dir = file.path.split('/').last;
-    bool exists = await doesFileExist(subdir);
-    if (!exists) {
-      Reference ref = storage.ref().child(
-          '${user.uid}/${parent_dir}/${path.basename(file.absolute.path)}');
-      await ref.putFile(file);
-      var url = await ref.getDownloadURL();
-      var photo = firestore
-          .collection('users')
-          .doc(user.uid)
-          .collection('captures')
-          .doc(subdir.split('_').first);
-      await photo.set({
-        'urls': {path.basename(file.absolute.path): url}
-      }, SetOptions(merge: true));
-      print('uploaded file ' + file.path);
-      updateFolderCount();
+  static Future uploadFiles(List videoPaths, String subdir) async {
+    Map urls = await getUrlMap(subdir);
+    for (var video in videoPaths) {
+      if (!urls['urls'].containsKey(video.split('/').last)) {
+        await uploadFile(video, subdir);
+      }
     }
+  }
+
+  static Future uploadFile(String videoPath, String subdir) async {
+    String parent_dir = subdir.split('_').first;
+
+    Reference ref = storage
+        .ref()
+        .child('${user.uid}/${parent_dir}/${path.basename(videoPath)}');
+    await ref.putFile(File(videoPath));
+    var url = await ref.getDownloadURL();
+    var photo = firestore
+        .collection('users')
+        .doc(user.uid)
+        .collection('captures')
+        .doc(parent_dir);
+    await photo.set({
+      'urls': {path.basename(videoPath): url}
+    }, SetOptions(merge: true));
+    print('uploaded file ' + videoPath);
+    updateFolderCount();
   }
 
   static Future deleteFile(var path) async {

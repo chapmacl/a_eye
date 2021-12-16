@@ -404,11 +404,8 @@ class _FileScreenState extends State<FileScreen> {
                                         textColor: AppTheme.appIndigo,
                                         fontSize: 16.0);
                                   }
-                                  // loop the list and upload each file
-                                  for (var path in videoPaths) {
-                                    await Backend.uploadFile(
-                                        File(path), folderName);
-                                  }
+                                  await Backend.uploadFiles(
+                                      videoPaths, folderName);
                                 }),
                           FocusedMenuItem(
                               title: Text(
