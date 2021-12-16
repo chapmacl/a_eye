@@ -166,13 +166,12 @@ class Backend {
     return q.get('urls');
   }
 
-  // TODO where to use this?
   static Future doesFileExist(String path) async {
     DocumentSnapshot q = await firestore
         .collection('users')
         .doc(user.uid)
         .collection('captures')
-        .doc(path)
+        .doc(path.split('_').first)
         .get();
     return q.exists;
   }
@@ -180,20 +179,23 @@ class Backend {
 // TODO test this
   static Future uploadFile(File file, String subdir) async {
     String parent_dir = file.path.split('/').last;
-    Reference ref = storage.ref().child(
-        '${user.uid}/${parent_dir}/${path.basename(file.absolute.path)}');
-    await ref.putFile(file);
-    var url = await ref.getDownloadURL();
-    var photo = firestore
-        .collection('users')
-        .doc(user.uid)
-        .collection('captures')
-        .doc(subdir.split('_').first);
-    await photo.set({
-      'urls': {path.basename(file.absolute.path): url}
-    }, SetOptions(merge: true));
-    print('uploaded file ' + file.path);
-    updateFolderCount();
+    bool exists = await doesFileExist(subdir);
+    if (!exists) {
+      Reference ref = storage.ref().child(
+          '${user.uid}/${parent_dir}/${path.basename(file.absolute.path)}');
+      await ref.putFile(file);
+      var url = await ref.getDownloadURL();
+      var photo = firestore
+          .collection('users')
+          .doc(user.uid)
+          .collection('captures')
+          .doc(subdir.split('_').first);
+      await photo.set({
+        'urls': {path.basename(file.absolute.path): url}
+      }, SetOptions(merge: true));
+      print('uploaded file ' + file.path);
+      updateFolderCount();
+    }
   }
 
   static Future deleteFile(var path) async {
