@@ -207,31 +207,30 @@ class Backend {
 
   static Future deleteFile(var path) async {
     if (path.contains('.mp4')) {
-      var parts = path.split('_');
-      var parent = '${parts[1]}_${parts[2]}';
-      var photo = await firestore
+      var parent = path.split('_').first;
+      var video = await firestore
           .collection('users')
           .doc(user.uid)
           .collection('captures')
           .doc(parent);
-      var q = await photo.get();
+      var q = await video.get();
       var url = q.get('urls')[path];
       await storage.refFromURL(url).delete();
       Map updatedMap = q.get('urls');
       updatedMap.remove(path);
-      await photo.set({'urls': updatedMap});
+      await video.set({'urls': updatedMap});
     } else {
-      var photo = await firestore
+      var video = await firestore
           .collection('users')
           .doc(user.uid)
           .collection('captures')
           .doc(path);
-      var q = await photo.get();
+      var q = await video.get();
       var urls = q.get('urls').values.toList();
       for (var url in urls) {
         await storage.refFromURL(url).delete();
       }
-      await photo.delete();
+      await video.delete();
     }
     updateFolderCount();
   }
