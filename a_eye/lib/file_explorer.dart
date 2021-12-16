@@ -382,23 +382,34 @@ class _FileScreenState extends State<FileScreen> {
                                 Share.shareFiles([videoList[index]],
                                     text: text);
                               }),
-                          FocusedMenuItem(
-                              title: Text("Backup data"),
-                              trailingIcon: Icon(Icons.cloud_upload_rounded),
-                              onPressed: () async {
-                                // get root dir id
-                                Fluttertoast.showToast(
-                                    msg: "Files are being uploaded...",
-                                    toastLength: Toast.LENGTH_SHORT,
-                                    gravity: ToastGravity.CENTER,
-                                    timeInSecForIosWeb: 1,
-                                    backgroundColor: AppTheme.notWhite,
-                                    textColor: AppTheme.appIndigo,
-                                    fontSize: 16.0);
-                                await Backend.uploadFile(
-                                    File(videoList[index]), folderName);
-                                // TODO update folders count
-                              }),
+                          if (!videoList[index].contains('.mp4'))
+                            FocusedMenuItem(
+                                title: Text("Backup data"),
+                                trailingIcon: Icon(Icons.cloud_upload_rounded),
+                                onPressed: () async {
+                                  var videoDir =
+                                      new Directory(videoList[index]);
+                                  var videoPaths = videoDir
+                                      .listSync()
+                                      .map((item) => item.path)
+                                      .toList(growable: false);
+                                  if (videoPaths.isNotEmpty) {
+                                    // get root dir id
+                                    Fluttertoast.showToast(
+                                        msg: "Files are being uploaded...",
+                                        toastLength: Toast.LENGTH_SHORT,
+                                        gravity: ToastGravity.CENTER,
+                                        timeInSecForIosWeb: 1,
+                                        backgroundColor: AppTheme.notWhite,
+                                        textColor: AppTheme.appIndigo,
+                                        fontSize: 16.0);
+                                  }
+                                  // loop the list and upload each file
+                                  for (var path in videoPaths) {
+                                    await Backend.uploadFile(
+                                        File(path), folderName);
+                                  }
+                                }),
                           FocusedMenuItem(
                               title: Text(
                                 "Delete",
