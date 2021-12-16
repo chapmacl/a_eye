@@ -242,7 +242,7 @@ class _FileScreenState extends State<FileScreen> {
                             (AppBar().preferredSize.height + 40 + 60) * 1.1,
                         child: isLocal
                             ? VideoGrid(_videoDir)
-                            : cloudImageGrid(_videoDir),
+                            : cloudVideoGrid(_videoDir),
                       ),
                     )),
     );
@@ -659,8 +659,7 @@ class _FileScreenState extends State<FileScreen> {
     return resultMap;
   }
 
-  Widget cloudImageGrid(String dir) {
-    // TODO somehow separate videos by device, might need to change cloud layout
+  Widget cloudVideoGrid(String dir) {
     List directory;
     Map results;
     return FutureBuilder(
@@ -744,7 +743,7 @@ class _FileScreenState extends State<FileScreen> {
                                             textColor: AppTheme.appIndigo,
                                             fontSize: 16.0);
 
-                                        // TODO add another downloader option
+                                        // TODO add another downloader for urls
                                         // if (directory[index].endsWith('.mp4')) {
                                         //   await ImageDownloader.downloadImage(
                                         //       results[directory[index]]);
@@ -828,34 +827,57 @@ class _FileScreenState extends State<FileScreen> {
                                                     updateDir(directory[index])
                                                   }
                                           },
-                                      child: ClipRRect(
-                                        borderRadius:
-                                            BorderRadius.circular(8.0),
-                                        child: Stack(
-                                          fit: StackFit.expand,
-                                          children: [
-                                            // Image.network(
-                                            //   // TODO thumbnail
-                                            //   results[directory[1]],
-                                            //   fit: BoxFit.cover,
-                                            // ),
-                                            Center(
-                                              child: CircleAvatar(
-                                                backgroundColor: Colors.white
-                                                    .withOpacity(0.8),
-                                                radius: 25,
-                                                child: Icon(
-                                                  Icons
-                                                      .play_circle_fill_rounded,
-                                                  size: 50,
-                                                  color: Colors.blueGrey
-                                                      .withOpacity(0.8),
-                                                ),
+                                      child: directory[index].endsWith('.mp4')
+                                          ? ClipRRect(
+                                              borderRadius:
+                                                  BorderRadius.circular(8.0),
+                                              child: Stack(
+                                                fit: StackFit.expand,
+                                                children: [
+                                                  // Image.network(
+                                                  //   results[directory[1]],
+                                                  //   fit: BoxFit.cover,
+                                                  // ),
+                                                  Center(
+                                                    child: CircleAvatar(
+                                                      backgroundColor: Colors
+                                                          .white
+                                                          .withOpacity(0.8),
+                                                      radius: 25,
+                                                      child: Icon(
+                                                        Icons
+                                                            .play_circle_fill_rounded,
+                                                        size: 50,
+                                                        color: Colors.blueGrey
+                                                            .withOpacity(0.8),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
                                               ),
-                                            ),
-                                          ],
-                                        ),
-                                      )),
+                                            )
+                                          : Column(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              children: [
+                                                  Icon(
+                                                    Icons.perm_media_outlined,
+                                                    color: AppTheme.appIndigo,
+                                                    size: 50,
+                                                  ),
+                                                  Padding(
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                            8.0),
+                                                    child: Text(
+                                                      dateToString(
+                                                          directory[index]),
+                                                      style: AppTheme.body1,
+                                                      textAlign:
+                                                          TextAlign.center,
+                                                    ),
+                                                  )
+                                                ])),
                                 ),
                               );
                             },
