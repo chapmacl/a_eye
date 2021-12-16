@@ -83,7 +83,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     () => DialogBackground(
                           blur: 2.0,
                           dialog: AlertDialog(
-                            title: Text("Photos"),
+                            title: Text("Videos"),
                             content: Column(
                               mainAxisSize: MainAxisSize.min,
                               children: [
@@ -91,7 +91,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                 Padding(
                                   padding: const EdgeInsets.all(8.0),
                                   child: Text(
-                                      "On this screen you can see all the photos and videos A.Eye. has captured. Tap and hold folders and files to see more options."),
+                                      "On this screen you can see all the videos A.Eye. has captured. Tap and hold folders and files to see more options."),
                                 ),
                               ],
                             ),
@@ -122,7 +122,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                 Padding(
                                   padding: const EdgeInsets.all(8.0),
                                   child: Text(
-                                      "On this screen you can see what A.Eye. is looking at. Tap on Quick Settings to adjust various settings. Don't forget to press the Play button when you're ready for A.Eye to start capturing photos!"),
+                                      "On this screen you can see what A.Eye. is looking at. Tap on Quick Settings to adjust various settings. Don't forget to press the Play button when you're ready for A.Eye to start capturing videos!"),
                                 ),
                               ],
                             ),
@@ -216,7 +216,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         child: Text(
                           'Done. \n You\'re all ready to start using A.Eye. smart camera. '
                           'It\'s completely free to use locally, and you can upload and store up to 5 captured events in our Cloud. '
-                          'The Cloud lets you view captured photos and videos on any device. '
+                          'The Cloud lets you view captured videos on any device. '
                           'Unlimited Cloud storage is available to subscribers.',
                           textAlign: TextAlign.center,
                           style: AppTheme.subtitle2,
@@ -255,7 +255,7 @@ class _MyHomePageState extends State<MyHomePage> {
             BottomNavyBarItem(
                 icon: Icon(Icons.photo_library_outlined),
                 title: Text(
-                  'Photos',
+                  'Videos',
                   style: AppTheme.title2,
                 ),
                 activeColor: AppTheme.appIndigo,
