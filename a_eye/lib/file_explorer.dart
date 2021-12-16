@@ -786,7 +786,7 @@ class _FileScreenState extends State<FileScreen> {
                                         if (result) {
                                           // Add current dir, then force to null to trigger loading animation. After deletion current directory is reloaded
                                           subdirs.add(_videoDir);
-                                          delete(results[directory[index]]);
+                                          delete(directory[index]);
                                         } else {
                                           print('else');
                                         }
