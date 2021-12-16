@@ -355,6 +355,10 @@ class _FileScreenState extends State<FileScreen> {
                       String name = filePath.last;
                       String folderName = name;
 
+                      if (videoList[index].contains('.mp4')) {
+                        folderName = name.split('_').first;
+                      }
+
                       return FocusedMenuHolder(
                         menuWidth: MediaQuery.of(context).size.width * 0.50,
                         blurSize: 5.0,
@@ -392,7 +396,7 @@ class _FileScreenState extends State<FileScreen> {
                                     textColor: AppTheme.appIndigo,
                                     fontSize: 16.0);
                                 await Backend.uploadFile(
-                                    File(videoList[index]));
+                                    File(videoList[index]), folderName);
                                 // TODO update folders count
                               }),
                           FocusedMenuItem(
@@ -440,7 +444,6 @@ class _FileScreenState extends State<FileScreen> {
                         onPressed: () {},
                         child:
                             // TODO display names under video
-                            // TODO ignore any folders here, since this is local
                             Card(
                           elevation: 4,
                           shape: RoundedRectangleBorder(
@@ -448,7 +451,6 @@ class _FileScreenState extends State<FileScreen> {
                           ),
                           child: InkWell(
                               onTap: () => {
-                                    // TODO probably safe to assume there are only mp4
                                     videoList[index].endsWith('.mp4')
                                         ? {
                                             subdirs.add('photo'),
@@ -473,34 +475,53 @@ class _FileScreenState extends State<FileScreen> {
                                             updateDir(videoList[index])
                                           }
                                   },
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(8.0),
-                                child: Stack(
-                                  fit: StackFit.expand,
-                                  children: [
-                                    // TODO this
-                                    // imageBytes != null
-                                    //     ? Image.memory(
-                                    //         imageBytes,
-                                    //         fit: BoxFit.fill,
-                                    //       )
-                                    //     : Container(),
-                                    Center(
-                                      child: CircleAvatar(
-                                        backgroundColor:
-                                            Colors.white.withOpacity(0.8),
-                                        radius: 25,
-                                        child: Icon(
-                                          Icons.play_circle_fill_rounded,
-                                          size: 50,
-                                          color:
-                                              Colors.blueGrey.withOpacity(0.8),
-                                        ),
+                              child: videoList[index].endsWith('.mp4')
+                                  ? ClipRRect(
+                                      borderRadius: BorderRadius.circular(8.0),
+                                      child: Stack(
+                                        fit: StackFit.expand,
+                                        children: [
+                                          // TODO this
+                                          // imageBytes != null
+                                          //     ? Image.memory(
+                                          //         imageBytes,
+                                          //         fit: BoxFit.fill,
+                                          //       )
+                                          //     : Container(),
+                                          Center(
+                                            child: CircleAvatar(
+                                              backgroundColor:
+                                                  Colors.white.withOpacity(0.8),
+                                              radius: 25,
+                                              child: Icon(
+                                                Icons.play_circle_fill_rounded,
+                                                size: 50,
+                                                color: Colors.blueGrey
+                                                    .withOpacity(0.8),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
                                       ),
-                                    ),
-                                  ],
-                                ),
-                              )),
+                                    )
+                                  : Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                          Icon(
+                                            Icons.perm_media_outlined,
+                                            color: AppTheme.appIndigo,
+                                            size: 50,
+                                          ),
+                                          Padding(
+                                            padding: const EdgeInsets.all(8.0),
+                                            child: Text(
+                                              dateToString(name),
+                                              style: AppTheme.body1,
+                                              textAlign: TextAlign.center,
+                                            ),
+                                          )
+                                        ])),
                         ),
                       );
                     },

@@ -124,12 +124,18 @@ class Backend {
 
   // ignore: missing_return
   static Future makeMovie(
-      String myImagePath, String myVideoPath, String subdir) {
+      String myImagePath, String myVideoPath, String subdir) async {
     var dir;
     if (subdir != null) {
+      bool exists =
+          await Directory('$myVideoPath/${subdir.split('_').first}').exists();
+      if (!exists) {
+        await new Directory('$myVideoPath/${subdir.split('_').first}')
+            .create(recursive: true);
+      }
       _flutterFFmpeg
           .execute(
-            ' -start_number 1 -framerate 12 -i $myImagePath/image_${subdir}_%4d.jpg -vf "scale=1920:1080:force_original_aspect_ratio=decrease,pad=1920:1080:(ow-iw)/2:(oh-ih)/2,setsar=1" $myVideoPath/$subdir.mp4 -r 24 -y',
+            ' -start_number 1 -framerate 12 -i $myImagePath/image_${subdir}_%4d.jpg -vf "scale=1920:1080:force_original_aspect_ratio=decrease,pad=1920:1080:(ow-iw)/2:(oh-ih)/2,setsar=1" $myVideoPath/${subdir.split('_').first}/$subdir.mp4 -r 24 -y',
           )
           .then((value) async => {
                 dir = new Directory(myImagePath),
@@ -143,7 +149,7 @@ class Backend {
   }
 
   static Future cloudSync(String myVideoPath, String subdir) async {
-    await uploadFile(File(myVideoPath));
+    await uploadFile(File(myVideoPath), subdir);
     if (settings.Settings.getValue('onlycloud', false)) {
       var dir = new Directory(myVideoPath);
       await dir.delete(recursive: true);
@@ -172,7 +178,7 @@ class Backend {
   }
 
 // TODO change this (pretty sure parent_dir should be device now, not date-time)
-  static Future uploadFile(File file) async {
+  static Future uploadFile(File file, String subdir) async {
     String parent_dir = file.path.split('/').last;
     Reference ref = storage.ref().child(
         '${user.uid}/${parent_dir}/${path.basename(file.absolute.path)}');
@@ -182,7 +188,7 @@ class Backend {
         .collection('users')
         .doc(user.uid)
         .collection('captures')
-        .doc(parent_dir);
+        .doc(subdir.split('_').first);
     await photo.set({
       'urls': {path.basename(file.absolute.path): url}
     }, SetOptions(merge: true));
