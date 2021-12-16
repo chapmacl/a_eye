@@ -9,10 +9,15 @@ String dateToString(String filename) {
   String prettyPrint;
   String timePrint;
   String datePrint;
-  if (filename.contains('video')) {
-    prettyPrint = 'Video';
+  if (!filename.contains('_')) {
+    List date = filename.split('-');
+    if (dateUS) {
+      prettyPrint = '${date[1]}/${date[2]}/${date[0]}';
+    } else {
+      prettyPrint = '${date[2]}/${date[1]}/${date[0]}';
+    }
   } else {
-    // instance of Folder: yyyy-mm-dd_HH:mm
+    // instance of Video: yyyy-mm-dd_HH:mm
     List path = filename.split('_');
     List date = path.first.split('-');
     List time = path.last.split(':');
