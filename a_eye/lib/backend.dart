@@ -177,7 +177,7 @@ class Backend {
     return q.exists;
   }
 
-// TODO change this (pretty sure parent_dir should be device now, not date-time)
+// TODO test this
   static Future uploadFile(File file, String subdir) async {
     String parent_dir = file.path.split('/').last;
     Reference ref = storage.ref().child(
