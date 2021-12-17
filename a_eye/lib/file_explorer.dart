@@ -161,8 +161,8 @@ class _FileScreenState extends State<FileScreen> {
       body: SlidingUpPanel(
           color: AppTheme.notWhite,
           controller: _pc,
-          minHeight: isLocal == true ? 0 : 40,
-          maxHeight: MediaQuery.of(context).size.height * 0.3,
+          minHeight: isLocal == true ? 0 : 60,
+          maxHeight: MediaQuery.of(context).size.height * 0.5,
           backdropEnabled: true,
           borderRadius: BorderRadius.only(
             topLeft: Radius.circular(24.0),
