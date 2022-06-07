@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 
 // ignore: must_be_immutable
 class MapScreen extends StatefulWidget {
-  Map labels;
+  late Map labels;
   MapScreen(this.labels);
 
   @override
@@ -83,7 +83,7 @@ class _MapScreenState extends State<MapScreen> {
                   activeColor: Colors.blueGrey,
                   title: new Text(key),
                   value: labelsMap[key],
-                  onChanged: (bool value) {
+                  onChanged: (bool? value) {
                     setState(() {
                       labelsMap[key] = value;
                     });

@@ -41,20 +41,20 @@ class Camera extends StatefulWidget {
 }
 
 class _CameraState extends State<Camera> {
-  CameraController controller;
+  CameraController? controller;
   bool isDetecting = false;
   // TODO play with this quality number
   imglib.JpegEncoder encoder = new imglib.JpegEncoder(quality: 80);
   DateFormat formatDate = new DateFormat('yyyy-MM-dd_HH:mm');
   NumberFormat formatNum = new NumberFormat("0000");
-  int cooldown;
+  late int cooldown;
   int cooldownInit = 200;
   bool startCapture = true;
-  String subdir;
-  int imageCount;
-  Map labelsMap;
+  String? subdir;
+  late int imageCount;
+  late Map labelsMap;
   String encodedMap = Settings.getValue('labelsmap', 'default');
-  bool permission;
+  bool? permission;
 
   @override
   void initState() {
@@ -86,7 +86,7 @@ class _CameraState extends State<Camera> {
 
         final myImagePath = '${directory.path}/Shots/$subdir';
         final myVideoPath = '${directory.path}/Shots';
-        Backend.makeMovie(myImagePath, myVideoPath, subdir);
+        Backend.makeMovie(myImagePath, myVideoPath, subdir!);
         subdir = null;
       });
     }
@@ -94,7 +94,7 @@ class _CameraState extends State<Camera> {
 
   @override
   Widget build(BuildContext context) {
-    if ((controller == null || !controller.value.isInitialized) &&
+    if ((controller == null || !controller!.value.isInitialized) &&
         permission == null) {
       return Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -149,15 +149,15 @@ class _CameraState extends State<Camera> {
         ],
       );
     } else if (permission = true && controller != null) {
-      var tmp = MediaQuery.of(context).size;
+      Size? tmp = MediaQuery.of(context).size;
       var screenH = math.max(tmp.height, tmp.width);
       var screenW = math.min(tmp.height, tmp.width);
-      tmp = controller.value.previewSize;
-      var previewH = math.max(tmp.height, tmp.width);
+      tmp = controller!.value.previewSize;
+      var previewH = math.max(tmp!.height, tmp.width);
       var previewW = math.min(tmp.height, tmp.width);
       var screenRatio = screenH / screenW;
       var previewRatio = previewH / previewW;
-      controller.setZoomLevel(widget.zoom);
+      controller!.setZoomLevel(widget.zoom);
 
       return OverflowBox(
         maxHeight: screenRatio > previewRatio
@@ -171,7 +171,7 @@ class _CameraState extends State<Camera> {
                 color: Colors.black,
               )
             : CameraPreview(
-                controller,
+                controller!,
               ),
       );
     } else {
@@ -184,7 +184,7 @@ class _CameraState extends State<Camera> {
     initCameras();
   }
 
-  void initCameras() async {
+  Future<void> initCameras() async {
     if (widget.cameras == null || widget.cameras.length < 1) {
       print('No camera is found');
     } else if (permission == false) {
@@ -194,8 +194,8 @@ class _CameraState extends State<Camera> {
           widget.cameras[0], ResolutionPreset.high,
           enableAudio: false);
 
-      await controller.initialize();
-      await controller.lockCaptureOrientation(DeviceOrientation.portraitUp);
+      await controller!.initialize();
+      await controller!.lockCaptureOrientation(DeviceOrientation.portraitUp);
       if (!mounted) {
         return;
       }
@@ -203,7 +203,7 @@ class _CameraState extends State<Camera> {
       setState(() {});
       Future.delayed(Duration(milliseconds: 250), () {});
 
-      controller.startImageStream((CameraImage img) async {
+      controller!.startImageStream((CameraImage img) async {
         // TODO create method with Timer(const Duration(seconds: 10), () => callback());
         // to only check every few seconds by setting isDetecting to true
         // once an object is detected automatically shut off the sleep function until cooldown expires
@@ -226,10 +226,10 @@ class _CameraState extends State<Camera> {
             threshold: 0.6,
             numResultsPerClass: 5,
             rotation:
-                widget.rotation + controller.description.sensorOrientation,
+                widget.rotation + controller!.description.sensorOrientation,
           ).then((recognitions) async {
             List filtered = [];
-            for (var obj in recognitions) {
+            for (var obj in recognitions!) {
               // remove any objects that are not set to be detected
               if (labelsMap[obj['detectedClass']]) {
                 filtered.add(obj);
@@ -289,7 +289,7 @@ class _CameraState extends State<Camera> {
 
                 final myImagePath = '${directory.path}/Shots/$subdir';
                 final myVideoPath = '${directory.path}/Shots';
-                Backend.makeMovie(myImagePath, myVideoPath, subdir);
+                Backend.makeMovie(myImagePath, myVideoPath, subdir!);
                 subdir = null;
               }
             }
@@ -307,7 +307,7 @@ class _CameraState extends State<Camera> {
 
           final myImagePath = '${directory.path}/Shots/$subdir';
           final myVideoPath = '${directory.path}/Shots';
-          Backend.makeMovie(myImagePath, myVideoPath, subdir);
+          Backend.makeMovie(myImagePath, myVideoPath, subdir!);
           subdir = null;
         }
       });
@@ -334,7 +334,7 @@ class _CameraState extends State<Camera> {
     if (!exists) {
       await new Directory(myImagePath).create(recursive: true);
     }
-    imglib.Image file;
+    late imglib.Image file;
 
     try {
       if (img.format.group == ImageFormatGroup.yuv420) {
@@ -346,7 +346,7 @@ class _CameraState extends State<Camera> {
       print(">>>>>>>>>>>> ERROR:" + e.toString());
     }
 
-    file = imglib.copyRotate(file, controller.description.sensorOrientation);
+    file = imglib.copyRotate(file, controller!.description.sensorOrientation);
 
     for (var obj in recognitions) {
       var x1, y1, x2, y2, w, h;
@@ -400,7 +400,7 @@ class _CameraState extends State<Camera> {
     if (imageCount > 999) {
       // if an object is captured for a lengthy period of time, a new directory is automatically created
       imageCount = 1;
-      Backend.makeMovie(myImagePath, myImagePath, subdir);
+      Backend.makeMovie(myImagePath, myImagePath, subdir!);
       subdir = formatDate.format(DateTime.now());
     }
     var write = new File("$myImagePath/image_$name.jpg")
@@ -422,7 +422,7 @@ class _CameraState extends State<Camera> {
       final int width = image.width;
       final int height = image.height;
       final int uvRowStride = image.planes[1].bytesPerRow;
-      final int uvPixelStride = image.planes[1].bytesPerPixel;
+      final int? uvPixelStride = image.planes[1].bytesPerPixel;
 
       imglib.Image img = imglib.Image(width, height); // Create Image buffer
 
@@ -430,7 +430,7 @@ class _CameraState extends State<Camera> {
       for (int x = 0; x < width; x++) {
         for (int y = 0; y < height; y++) {
           final int uvIndex =
-              uvPixelStride * (x / 2).floor() + uvRowStride * (y / 2).floor();
+              uvPixelStride! * (x / 2).floor() + uvRowStride * (y / 2).floor();
           final int index = y * width + x;
 
           final yp = image.planes[0].bytes[index];

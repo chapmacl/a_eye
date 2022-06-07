@@ -21,11 +21,11 @@ class VideoScreen extends StatefulWidget {
 
 class _VideoScreenState extends State<VideoScreen>
     with TickerProviderStateMixin {
-  Animation<double> _myAnimation;
-  AnimationController _animController;
-  VideoPlayerController _controller;
-  String video_url;
-  bool isLocal;
+  late Animation<double> _myAnimation;
+  late AnimationController _animController;
+  VideoPlayerController? _controller;
+  late String video_url;
+  late bool isLocal;
 
   @override
   void initState() {
@@ -58,10 +58,11 @@ class _VideoScreenState extends State<VideoScreen>
   @override
   Widget build(BuildContext context) {
     String name;
+    // TODO wtf is this shit??
     _controller = isLocal
         ? VideoPlayerController.file(File(video_url))
         : VideoPlayerController.network(video_url);
-    Future _initializeVideoPlayerFuture = _controller.initialize();
+    Future _initializeVideoPlayerFuture = _controller!.initialize();
     name = isLocal ? video_url.split('/').last : video_url;
     return Scaffold(
         appBar: AppBar(
@@ -128,14 +129,14 @@ class _VideoScreenState extends State<VideoScreen>
           future: _initializeVideoPlayerFuture,
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.done) {
-              _controller.setLooping(true);
+              _controller!.setLooping(true);
               return GestureDetector(
                 onTap: () {
-                  if (_controller.value.isPlaying) {
-                    _controller.pause();
+                  if (_controller!.value.isPlaying) {
+                    _controller!.pause();
                     _animController.reverse();
                   } else {
-                    _controller.play();
+                    _controller!.play();
                     _animController.forward();
                   }
                 },
@@ -146,7 +147,7 @@ class _VideoScreenState extends State<VideoScreen>
                       Center(
                         child: AspectRatio(
                             aspectRatio: 16.0 / 9.0,
-                            child: VideoPlayer(_controller)),
+                            child: VideoPlayer(_controller!)),
                       ),
                       Padding(
                         padding: const EdgeInsets.only(bottom: 10.0),
