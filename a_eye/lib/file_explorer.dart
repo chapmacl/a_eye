@@ -278,7 +278,6 @@ class _FileScreenState extends State<FileScreen> {
     });
   }
 
-// TODO update folders count here
   void delete(var path) async {
     updateDir(null);
     if (isLocal) {

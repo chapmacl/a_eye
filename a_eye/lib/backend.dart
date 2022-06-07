@@ -236,7 +236,7 @@ class Backend {
   }
 
   static Future updateFolderCount() async {
-    //TODO if (user is not premium)... maybe? I mean, if the user is premium we don't care how many folder they have...
+    //TODO if (user is not premium)... if the user is premium we don't care how many folder they have...
     //plus, this value can be updated at any time and only really matters to free users.
 
     // or an idea: premium user is -1 folders, so as to avoid more variables
