@@ -55,7 +55,7 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
-    newUser = Settings.getValue('newuser', true);
+    newUser = Settings.getValue('newuser', defaultValue: true)!;
     if (newUser) {
       _currentIndex = 0;
     }
@@ -77,7 +77,8 @@ class _MyHomePageState extends State<MyHomePage> {
           onPageChanged: (index) {
             setState(() => _currentIndex = index);
             if (!newUser) {
-              if (index == 0 && Settings.getValue('newuserfile', true)) {
+              if (index == 0 &&
+                  Settings.getValue('newuserfile', defaultValue: true)!) {
                 Future.delayed(
                     Duration(milliseconds: 100),
                     () => DialogBackground(
@@ -108,7 +109,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         ).show(context,
                             transitionType: DialogTransitionType.Bubble));
               } else if (index == 1 &&
-                  Settings.getValue('newusercamera', true)) {
+                  Settings.getValue('newusercamera', defaultValue: true)!) {
                 Future.delayed(
                     Duration(milliseconds: 100),
                     () => DialogBackground(

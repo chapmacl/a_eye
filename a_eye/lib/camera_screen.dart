@@ -35,11 +35,11 @@ class _CameraScreenState extends State<CameraScreen>
   PanelController _pc = new PanelController();
   late Animation<double> _myAnimation;
   late AnimationController _controller;
-  bool blackout = Settings.getValue('blackout', false);
-  bool bbox = Settings.getValue('bbox', true);
-  bool labels = Settings.getValue('labels', true);
+  bool blackout = Settings.getValue('blackout', defaultValue: false)!;
+  bool bbox = Settings.getValue('bbox', defaultValue: true)!;
+  bool labels = Settings.getValue('labels', defaultValue: true)!;
   int? folderCount;
-  double zoom = Settings.getValue('zoom', 1.0);
+  double zoom = Settings.getValue('zoom', defaultValue: 1.0)!;
   bool isDetecting = false;
   late StreamSubscription<AccelerometerEvent> sub;
   int x = 0;
@@ -61,14 +61,14 @@ class _CameraScreenState extends State<CameraScreen>
       y = (event.y / 9.81).round();
       z = (event.z / 9.81).round();
     });
-    folderCount = Settings.getValue('folders', 0);
+    folderCount = Settings.getValue('folders', defaultValue: 0);
   }
 
   loadModel() async {
     String? res;
     Tflite.close();
     res = await Tflite.loadModel(
-      model: "assets/models/lite1.tflite",
+      model: "assets/models/mobilenet_v2_1.0_224_quantized_1_metadata_1.tflite",
       labels: "assets/models/ssd_mobilenet.txt",
       //useGpuDelegate: true,
     );

@@ -4,8 +4,8 @@ import 'package:flutter_settings_screens/flutter_settings_screens.dart';
 NumberFormat formatNum = new NumberFormat("00");
 
 String dateToString(String filename) {
-  bool timeUS = Settings.getValue('time', true);
-  bool dateUS = Settings.getValue('date', true);
+  bool timeUS = Settings.getValue('time', defaultValue: true)!;
+  bool dateUS = Settings.getValue('date', defaultValue: true)!;
   String prettyPrint;
   String timePrint;
   String datePrint;

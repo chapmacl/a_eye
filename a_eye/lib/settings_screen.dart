@@ -16,7 +16,7 @@ class SettingsArea extends StatefulWidget {
 }
 
 class _SettingsAreaState extends State<SettingsArea> {
-  String encodedMap = Settings.getValue('labelsmap', 'default');
+  String encodedMap = Settings.getValue('labelsmap', defaultValue: 'default')!;
   late Map labelsMap;
 
   @override
