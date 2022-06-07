@@ -30,7 +30,7 @@ class FileScreen extends StatefulWidget {
 }
 
 class _FileScreenState extends State<FileScreen> {
-  var _videoDir;
+  String? _videoDir;
   String title = '';
   List subdirs = [];
   bool? isLocal;
@@ -241,8 +241,8 @@ class _FileScreenState extends State<FileScreen> {
                         height: MediaQuery.of(context).size.height -
                             (AppBar().preferredSize.height + 40 + 60) * 1.1,
                         child: isLocal!
-                            ? VideoGrid(_videoDir)
-                            : cloudVideoGrid(_videoDir),
+                            ? VideoGrid(_videoDir!)
+                            : cloudVideoGrid(_videoDir!),
                       ),
                     )),
     );

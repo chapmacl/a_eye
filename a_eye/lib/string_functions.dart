@@ -48,7 +48,7 @@ String dateToString(String filename) {
   return prettyPrint;
 }
 
-String getTitle(String _videoDir) {
+String getTitle(String? _videoDir) {
   String title;
   if (_videoDir == null) {
     title = '';
