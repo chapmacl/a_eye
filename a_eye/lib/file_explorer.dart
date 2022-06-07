@@ -83,7 +83,7 @@ class _FileScreenState extends State<FileScreen> {
     BackButtonInterceptor.add(myInterceptor);
     _videoDir = 'null';
     isLocal = null;
-    folderCount = Settings.getValue('folders', 0);
+    folderCount = Settings.getValue('folders', defaultValue: 0)!;
   }
 
   @override

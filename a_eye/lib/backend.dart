@@ -140,7 +140,7 @@ class Backend {
           .then((value) async => {
                 dir = new Directory(myImagePath),
                 await dir.delete(recursive: true),
-                if (settings.Settings.getValue('drive', false))
+                if (settings.Settings.getValue('drive', defaultValue: false)!)
                   {
                     cloudSync('$myVideoPath/$subdir', subdir),
                   }
@@ -150,7 +150,7 @@ class Backend {
 
   static Future cloudSync(String myVideoPath, String subdir) async {
     await uploadFile(myVideoPath, subdir);
-    if (settings.Settings.getValue('onlycloud', false)) {
+    if (settings.Settings.getValue('onlycloud', defaultValue: false)!) {
       var dir = new Directory(myVideoPath);
       await dir.delete(recursive: true);
     }

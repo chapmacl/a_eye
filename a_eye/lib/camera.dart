@@ -53,7 +53,7 @@ class _CameraState extends State<Camera> {
   String? subdir;
   late int imageCount;
   late Map labelsMap;
-  String encodedMap = Settings.getValue('labelsmap', 'default');
+  String encodedMap = Settings.getValue('labelsmap', defaultValue: 'default')!;
   bool? permission;
 
   @override
