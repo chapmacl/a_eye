@@ -41,7 +41,7 @@ dependencies:
   path_provider: ^2.0.1
   permission_handler: ^8.2.5
   sensors_plus: ^1.0.2
-  share_plus: ^3.0.1
+  share_plus: ^4.0.7
   sliding_up_panel: ^2.0.0+1
   tflite: ^1.1.2
   video_player: ^2.1.4

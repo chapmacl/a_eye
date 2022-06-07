@@ -68,7 +68,7 @@ class _CameraScreenState extends State<CameraScreen>
     String? res;
     Tflite.close();
     res = await Tflite.loadModel(
-      model: "assets/models/mobilenet_v2_1.0_224_quantized_1_metadata_1.tflite",
+      model: "assets/models/lite1.tflite",
       labels: "assets/models/ssd_mobilenet.txt",
       //useGpuDelegate: true,
     );
