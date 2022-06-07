@@ -21,7 +21,7 @@ import 'package:sliding_up_panel/sliding_up_panel.dart';
 
 // ignore: must_be_immutable
 class FileScreen extends StatefulWidget {
-  PageController pageController;
+  PageController? pageController;
 
   FileScreen(this.pageController);
 
@@ -33,10 +33,10 @@ class _FileScreenState extends State<FileScreen> {
   var _videoDir;
   String title = '';
   List subdirs = [];
-  bool isLocal;
+  bool? isLocal;
   ScrollController controller = ScrollController();
   final FlutterFFmpeg _flutterFFmpeg = new FlutterFFmpeg();
-  int folderCount;
+  late int folderCount;
   PanelController _pc = new PanelController();
 
   bool myInterceptor(bool stopDefaultButtonEvent, RouteInfo info) {
@@ -240,7 +240,7 @@ class _FileScreenState extends State<FileScreen> {
                       child: Container(
                         height: MediaQuery.of(context).size.height -
                             (AppBar().preferredSize.height + 40 + 60) * 1.1,
-                        child: isLocal
+                        child: isLocal!
                             ? VideoGrid(_videoDir)
                             : cloudVideoGrid(_videoDir),
                       ),
@@ -249,7 +249,7 @@ class _FileScreenState extends State<FileScreen> {
   }
 
   getDir() async {
-    if (isLocal) {
+    if (isLocal!) {
       var directory;
       if (Platform.isIOS) {
         directory = await getApplicationDocumentsDirectory();
@@ -272,7 +272,7 @@ class _FileScreenState extends State<FileScreen> {
     setState(() {});
   }
 
-  void updateDir(String dir) {
+  void updateDir(String? dir) {
     setState(() {
       _videoDir = dir;
     });
@@ -280,7 +280,7 @@ class _FileScreenState extends State<FileScreen> {
 
   void delete(var path) async {
     updateDir(null);
-    if (isLocal) {
+    if (isLocal!) {
       Directory dir = new Directory(path);
       await dir.delete(recursive: true);
       isLocal = null;
@@ -466,7 +466,7 @@ class _FileScreenState extends State<FileScreen> {
                                                     builder: (context) =>
                                                         VideoScreen(
                                                             videoList[index],
-                                                            isLocal)))
+                                                            isLocal!)))
                                                 .then((value) {
                                               if (value == 'pop') {
                                                 subdirs.removeLast();
@@ -540,7 +540,7 @@ class _FileScreenState extends State<FileScreen> {
   }
 
   Widget rootGrid() {
-    User user;
+    User? user;
     return Container(
         color: AppTheme.nearlyWhite,
         child: GridView.count(
@@ -601,7 +601,7 @@ class _FileScreenState extends State<FileScreen> {
                               child: Text("Sign in"),
                               onPressed: () {
                                 Navigator.pop(context);
-                                widget.pageController.jumpToPage(2);
+                                widget.pageController!.jumpToPage(2);
                               },
                             ),
                             TextButton(
@@ -660,7 +660,7 @@ class _FileScreenState extends State<FileScreen> {
 
   Widget cloudVideoGrid(String dir) {
     List directory;
-    Map results;
+    Map? results;
     return FutureBuilder(
       future: getCloudData(dir),
       builder: (context, dataSnapshot) {
@@ -676,8 +676,8 @@ class _FileScreenState extends State<FileScreen> {
               child: Text(dataSnapshot.error.toString()),
             );
           } else {
-            results = dataSnapshot.data;
-            directory = results.keys.toList();
+            results = dataSnapshot.data as Map?;
+            directory = results!.keys.toList();
             directory.sort((a, b) => b.toString().compareTo(a.toString()));
             return Padding(
               padding: const EdgeInsets.all(8.0),
@@ -806,9 +806,10 @@ class _FileScreenState extends State<FileScreen> {
                                                         .push(MaterialPageRoute(
                                                             builder: (context) =>
                                                                 VideoScreen(
-                                                                    results[directory[
-                                                                        index]],
-                                                                    isLocal)))
+                                                                    results![
+                                                                        directory[
+                                                                            index]],
+                                                                    isLocal!)))
                                                         .then((value) {
                                                       if (value == 'pop') {
                                                         subdirs.removeLast();

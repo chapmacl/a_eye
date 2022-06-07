@@ -28,24 +28,24 @@ class CameraScreen extends StatefulWidget {
 
 class _CameraScreenState extends State<CameraScreen>
     with TickerProviderStateMixin {
-  List<dynamic> _recognitions;
+  List<dynamic>? _recognitions;
   int _imageHeight = 0;
   int _imageWidth = 0;
   bool _model = false;
   PanelController _pc = new PanelController();
-  Animation<double> _myAnimation;
-  AnimationController _controller;
+  late Animation<double> _myAnimation;
+  late AnimationController _controller;
   bool blackout = Settings.getValue('blackout', false);
   bool bbox = Settings.getValue('bbox', true);
   bool labels = Settings.getValue('labels', true);
-  int folderCount;
+  int? folderCount;
   double zoom = Settings.getValue('zoom', 1.0);
   bool isDetecting = false;
-  StreamSubscription<AccelerometerEvent> sub;
+  late StreamSubscription<AccelerometerEvent> sub;
   int x = 0;
   int y = 1;
   int z = 0;
-  int rotation;
+  late int rotation;
 
   @override
   void initState() {
@@ -65,7 +65,7 @@ class _CameraScreenState extends State<CameraScreen>
   }
 
   loadModel() async {
-    String res;
+    String? res;
     Tflite.close();
     res = await Tflite.loadModel(
       model: "assets/models/lite1.tflite",
@@ -107,7 +107,7 @@ class _CameraScreenState extends State<CameraScreen>
   @override
   Widget build(BuildContext context) {
     Size screen = MediaQuery.of(context).size;
-    User user = Backend.getUser();
+    User? user = Backend.getUser();
     if (user == null) {
       Settings.setValue('drive', false);
     }

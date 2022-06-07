@@ -17,7 +17,7 @@ class SettingsArea extends StatefulWidget {
 
 class _SettingsAreaState extends State<SettingsArea> {
   String encodedMap = Settings.getValue('labelsmap', 'default');
-  Map labelsMap;
+  late Map labelsMap;
 
   @override
   void initState() {
@@ -32,7 +32,7 @@ class _SettingsAreaState extends State<SettingsArea> {
 
   @override
   Widget build(BuildContext context) {
-    User user = Backend.getUser();
+    User? user = Backend.getUser();
     bool result = false;
     return Scaffold(
       appBar: AppBar(

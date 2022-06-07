@@ -18,12 +18,12 @@ class Backend {
   static FirebaseStorage storage = FirebaseStorage.instance;
   static FirebaseFirestore firestore = FirebaseFirestore.instance;
   static GoogleSignIn googleSignIn = GoogleSignIn();
-  static GoogleSignInAccount googleSignInAccount;
-  static User user = auth.currentUser;
+  static GoogleSignInAccount? googleSignInAccount;
+  static User? user = auth.currentUser;
   static FlutterFFmpeg _flutterFFmpeg = new FlutterFFmpeg();
 
   static Future<FirebaseApp> initializeFirebase({
-    BuildContext context,
+    BuildContext? context,
   }) async {
     FirebaseApp firebaseApp = await Firebase.initializeApp();
     if (user != null) {
@@ -35,12 +35,12 @@ class Backend {
     return firebaseApp;
   }
 
-  static Future<User> signInWithGoogle({BuildContext context}) async {
+  static Future<User?> signInWithGoogle({BuildContext? context}) async {
     googleSignInAccount = await googleSignIn.signIn();
 
     if (googleSignInAccount != null) {
       final GoogleSignInAuthentication googleSignInAuthentication =
-          await googleSignInAccount.authentication;
+          await googleSignInAccount!.authentication;
 
       final AuthCredential credential = GoogleAuthProvider.credential(
         accessToken: googleSignInAuthentication.accessToken,
@@ -87,11 +87,11 @@ class Backend {
     return user;
   }
 
-  static User getUser() {
+  static User? getUser() {
     return user;
   }
 
-  static Future<void> signOut({BuildContext context}) async {
+  static Future<void> signOut({BuildContext? context}) async {
     try {
       await auth.signOut();
 
@@ -112,7 +112,7 @@ class Backend {
   static Future getFolders() async {
     QuerySnapshot q = await firestore
         .collection('users')
-        .doc(user.uid)
+        .doc(user!.uid)
         .collection('captures')
         .get();
     Map results = {};
@@ -159,7 +159,7 @@ class Backend {
   static Future getFiles(String dir) async {
     DocumentSnapshot q = await firestore
         .collection('users')
-        .doc(user.uid)
+        .doc(user!.uid)
         .collection('captures')
         .doc(dir)
         .get();
@@ -169,7 +169,7 @@ class Backend {
   static Future getUrlMap(String path) async {
     DocumentSnapshot q = await firestore
         .collection('users')
-        .doc(user.uid)
+        .doc(user!.uid)
         .collection('captures')
         .doc(path.split('_').first)
         .get();
@@ -190,12 +190,12 @@ class Backend {
 
     Reference ref = storage
         .ref()
-        .child('${user.uid}/${parent_dir}/${path.basename(videoPath)}');
+        .child('${user!.uid}/${parent_dir}/${path.basename(videoPath)}');
     await ref.putFile(File(videoPath));
     var url = await ref.getDownloadURL();
     var video = firestore
         .collection('users')
-        .doc(user.uid)
+        .doc(user!.uid)
         .collection('captures')
         .doc(parent_dir);
     await video.set({
@@ -210,7 +210,7 @@ class Backend {
       var parent = path.split('_').first;
       var video = await firestore
           .collection('users')
-          .doc(user.uid)
+          .doc(user!.uid)
           .collection('captures')
           .doc(parent);
       var q = await video.get();
@@ -222,7 +222,7 @@ class Backend {
     } else {
       var video = await firestore
           .collection('users')
-          .doc(user.uid)
+          .doc(user!.uid)
           .collection('captures')
           .doc(path);
       var q = await video.get();
