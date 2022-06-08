@@ -172,11 +172,15 @@ class _CameraViewState extends State<CameraView> {
       });
       _controller?.startImageStream(_processCameraImage);
       setState(() {});
+    }).catchError((error) {
+      // This usually happens when dispose finishes before this future. Ignore
+      print(error.toString());
     });
   }
 
   Future _stopLiveFeed() async {
-    await _controller?.stopImageStream();
+    if (_controller?.value.isInitialized == true)
+      await _controller?.stopImageStream();
     await _controller?.dispose();
     _controller = null;
   }

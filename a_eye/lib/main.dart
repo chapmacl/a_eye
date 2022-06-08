@@ -1,5 +1,6 @@
 import 'package:a_eye/app_theme.dart';
 import 'package:a_eye/backend.dart';
+import 'package:a_eye/object_detector_view.dart';
 import 'package:a_eye/settings_screen.dart';
 import 'package:bottom_navy_bar/bottom_navy_bar.dart';
 import 'package:camera/camera.dart';
@@ -239,7 +240,8 @@ class _MyHomePageState extends State<MyHomePage> {
                 ]
               : [
                   FileScreen(_pageController),
-                  CameraScreen(cameras),
+                  //CameraScreen(cameras),
+                  ObjectDetectorView(),
                   SettingsArea(),
                 ],
         ),
