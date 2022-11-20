@@ -53,7 +53,7 @@ class _ObjectDetectorView extends State<ObjectDetectorView> {
   void _onScreenModeChanged(ScreenMode mode) {
     switch (mode) {
       case ScreenMode.gallery:
-        _initializeDetector(DetectionMode.singleImage);
+        _initializeDetector(DetectionMode.single);
         return;
 
       case ScreenMode.liveFeed:
