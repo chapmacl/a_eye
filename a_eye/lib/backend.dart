@@ -11,7 +11,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_settings_screens/flutter_settings_screens.dart'
     as settings;
-import 'package:flutter_ffmpeg/flutter_ffmpeg.dart';
+import 'package:ffmpeg_kit_flutter/ffmpeg_kit.dart';
 
 class Backend {
   static FirebaseAuth auth = FirebaseAuth.instance;
@@ -20,7 +20,6 @@ class Backend {
   static GoogleSignIn googleSignIn = GoogleSignIn();
   static GoogleSignInAccount? googleSignInAccount;
   static User? user = auth.currentUser;
-  static FlutterFFmpeg _flutterFFmpeg = new FlutterFFmpeg();
 
   static Future<FirebaseApp> initializeFirebase({
     BuildContext? context,
@@ -133,18 +132,16 @@ class Backend {
         await new Directory('$myVideoPath/${subdir.split('_').first}')
             .create(recursive: true);
       }
-      _flutterFFmpeg
-          .execute(
-            ' -start_number 1 -framerate 12 -i $myImagePath/image_${subdir}_%4d.jpg -vf "scale=1920:1080:force_original_aspect_ratio=decrease,pad=1920:1080:(ow-iw)/2:(oh-ih)/2,setsar=1" $myVideoPath/${subdir.split('_').first}/$subdir.mp4 -r 24 -y',
-          )
-          .then((value) async => {
-                dir = new Directory(myImagePath),
-                await dir.delete(recursive: true),
-                if (settings.Settings.getValue('drive', defaultValue: false)!)
-                  {
-                    cloudSync('$myVideoPath/$subdir', subdir),
-                  }
-              });
+      FFmpegKit.execute(
+        ' -start_number 1 -framerate 12 -i $myImagePath/image_${subdir}_%4d.jpg -vf "scale=1920:1080:force_original_aspect_ratio=decrease,pad=1920:1080:(ow-iw)/2:(oh-ih)/2,setsar=1" $myVideoPath/${subdir.split('_').first}/$subdir.mp4 -r 24 -y',
+      ).then((value) async => {
+            dir = new Directory(myImagePath),
+            await dir.delete(recursive: true),
+            if (settings.Settings.getValue('drive', defaultValue: false)!)
+              {
+                cloudSync('$myVideoPath/$subdir', subdir),
+              }
+          });
     }
   }
 

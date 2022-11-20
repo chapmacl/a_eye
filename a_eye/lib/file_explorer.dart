@@ -8,7 +8,7 @@ import 'package:draggable_scrollbar/draggable_scrollbar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_ffmpeg/flutter_ffmpeg.dart';
+import 'package:ffmpeg_kit_flutter/ffmpeg_kit.dart';
 import 'package:flutter_settings_screens/flutter_settings_screens.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -35,7 +35,6 @@ class _FileScreenState extends State<FileScreen> {
   List subdirs = [];
   bool? isLocal;
   ScrollController controller = ScrollController();
-  final FlutterFFmpeg _flutterFFmpeg = new FlutterFFmpeg();
   late int folderCount;
   PanelController _pc = new PanelController();
 

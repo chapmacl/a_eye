@@ -9,7 +9,6 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:tflite/tflite.dart';
 import 'dart:math' as math;
 import 'package:image/image.dart' as imglib;
 import 'dart:io';
@@ -203,114 +202,114 @@ class _CameraState extends State<Camera> {
       setState(() {});
       Future.delayed(Duration(milliseconds: 250), () {});
 
-      controller!.startImageStream((CameraImage img) async {
-        // TODO create method with Timer(const Duration(seconds: 10), () => callback());
-        // to only check every few seconds by setting isDetecting to true
-        // once an object is detected automatically shut off the sleep function until cooldown expires
+      // controller!.startImageStream((CameraImage img) async {
+      //   // TODO create method with Timer(const Duration(seconds: 10), () => callback());
+      //   // to only check every few seconds by setting isDetecting to true
+      //   // once an object is detected automatically shut off the sleep function until cooldown expires
 
-        //isDetecting = true;
+      //   //isDetecting = true;
 
-        if (!isDetecting) {
-          isDetecting = true;
-          int startTime = new DateTime.now().millisecondsSinceEpoch;
+      //   if (!isDetecting) {
+      //     isDetecting = true;
+      //     int startTime = new DateTime.now().millisecondsSinceEpoch;
 
-          Tflite.detectObjectOnFrame(
-            bytesList: img.planes.map((plane) {
-              return plane.bytes;
-            }).toList(),
-            model: "SSDMobileNet",
-            imageHeight: img.height,
-            imageWidth: img.width,
-            imageMean: 127.5,
-            imageStd: 127.5,
-            threshold: 0.6,
-            numResultsPerClass: 5,
-            rotation:
-                widget.rotation + controller!.description.sensorOrientation,
-          ).then((recognitions) async {
-            List filtered = [];
-            for (var obj in recognitions!) {
-              // remove any objects that are not set to be detected
-              if (labelsMap[obj['detectedClass']]) {
-                filtered.add(obj);
-              }
-            }
-            List adjusted = List.from(filtered);
-            if (mounted) {
-              // Take care to remember android automatically rotates 90, so this might be incorrect on other devices
-              if (widget.rotation == 0) {
-                // do nothing
-              } else if (widget.rotation == 90) {
-                for (Map obj in adjusted) {
-                  var temp = (1.0 - obj['rect']['x']) - obj['rect']['w'];
-                  obj['rect']['x'] = obj['rect']['y'];
-                  obj['rect']['y'] = temp;
-                  temp = obj['rect']['w'];
-                  obj['rect']['w'] = obj['rect']['h'];
-                  obj['rect']['h'] = temp;
-                }
-              } else if (widget.rotation == 180) {
-                for (Map obj in adjusted) {
-                  obj['rect']['x'] =
-                      (1.0 - obj['rect']['x']) - obj['rect']['w'];
-                  obj['rect']['y'] =
-                      (1.0 - obj['rect']['y']) - obj['rect']['h'];
-                }
-              } else if (widget.rotation == 270) {
-                for (Map obj in adjusted) {
-                  var temp = obj['rect']['x'];
-                  obj['rect']['x'] =
-                      (1.0 - obj['rect']['y']) - obj['rect']['h'];
-                  obj['rect']['y'] = temp;
-                  temp = obj['rect']['w'];
-                  obj['rect']['w'] = obj['rect']['h'];
-                  obj['rect']['h'] = temp;
-                }
-              }
-              widget.setRecognitions(adjusted, img.height, img.width);
-            }
-            if (filtered.isNotEmpty && widget.model) {
-              // Object was detected and model is ready. Restart cooldown timer, begin converting image to save
-              cooldown = cooldownInit;
-              convertImg(img, adjusted);
-            } else if (!startCapture) {
-              cooldown -= 1;
-              print(cooldown);
-              if (cooldown == 0) {
-                // Cooldown timer has reached the threshold, begin new capture folder
-                cooldown = cooldownInit;
-                startCapture = true;
-                var directory;
-                if (Platform.isIOS) {
-                  directory = await getApplicationDocumentsDirectory();
-                } else {
-                  directory = await getExternalStorageDirectory();
-                }
+      //     Tflite.detectObjectOnFrame(
+      //       bytesList: img.planes.map((plane) {
+      //         return plane.bytes;
+      //       }).toList(),
+      //       model: "SSDMobileNet",
+      //       imageHeight: img.height,
+      //       imageWidth: img.width,
+      //       imageMean: 127.5,
+      //       imageStd: 127.5,
+      //       threshold: 0.6,
+      //       numResultsPerClass: 5,
+      //       rotation:
+      //           widget.rotation + controller!.description.sensorOrientation,
+      //     ).then((recognitions) async {
+      //       List filtered = [];
+      //       for (var obj in recognitions!) {
+      //         // remove any objects that are not set to be detected
+      //         if (labelsMap[obj['detectedClass']]) {
+      //           filtered.add(obj);
+      //         }
+      //       }
+      //       List adjusted = List.from(filtered);
+      //       if (mounted) {
+      //         // Take care to remember android automatically rotates 90, so this might be incorrect on other devices
+      //         if (widget.rotation == 0) {
+      //           // do nothing
+      //         } else if (widget.rotation == 90) {
+      //           for (Map obj in adjusted) {
+      //             var temp = (1.0 - obj['rect']['x']) - obj['rect']['w'];
+      //             obj['rect']['x'] = obj['rect']['y'];
+      //             obj['rect']['y'] = temp;
+      //             temp = obj['rect']['w'];
+      //             obj['rect']['w'] = obj['rect']['h'];
+      //             obj['rect']['h'] = temp;
+      //           }
+      //         } else if (widget.rotation == 180) {
+      //           for (Map obj in adjusted) {
+      //             obj['rect']['x'] =
+      //                 (1.0 - obj['rect']['x']) - obj['rect']['w'];
+      //             obj['rect']['y'] =
+      //                 (1.0 - obj['rect']['y']) - obj['rect']['h'];
+      //           }
+      //         } else if (widget.rotation == 270) {
+      //           for (Map obj in adjusted) {
+      //             var temp = obj['rect']['x'];
+      //             obj['rect']['x'] =
+      //                 (1.0 - obj['rect']['y']) - obj['rect']['h'];
+      //             obj['rect']['y'] = temp;
+      //             temp = obj['rect']['w'];
+      //             obj['rect']['w'] = obj['rect']['h'];
+      //             obj['rect']['h'] = temp;
+      //           }
+      //         }
+      //         widget.setRecognitions(adjusted, img.height, img.width);
+      //       }
+      //       if (filtered.isNotEmpty && widget.model) {
+      //         // Object was detected and model is ready. Restart cooldown timer, begin converting image to save
+      //         cooldown = cooldownInit;
+      //         convertImg(img, adjusted);
+      //       } else if (!startCapture) {
+      //         cooldown -= 1;
+      //         print(cooldown);
+      //         if (cooldown == 0) {
+      //           // Cooldown timer has reached the threshold, begin new capture folder
+      //           cooldown = cooldownInit;
+      //           startCapture = true;
+      //           var directory;
+      //           if (Platform.isIOS) {
+      //             directory = await getApplicationDocumentsDirectory();
+      //           } else {
+      //             directory = await getExternalStorageDirectory();
+      //           }
 
-                final myImagePath = '${directory.path}/Shots/$subdir';
-                final myVideoPath = '${directory.path}/Shots';
-                Backend.makeMovie(myImagePath, myVideoPath, subdir!);
-                subdir = null;
-              }
-            }
-            int endTime = new DateTime.now().millisecondsSinceEpoch;
-            //print("Detection took ${endTime - startTime}");
-            isDetecting = false;
-          });
-        } else if (subdir != null && !widget.model) {
-          var directory;
-          if (Platform.isIOS) {
-            directory = await getApplicationDocumentsDirectory();
-          } else {
-            directory = await getExternalStorageDirectory();
-          }
+      //           final myImagePath = '${directory.path}/Shots/$subdir';
+      //           final myVideoPath = '${directory.path}/Shots';
+      //           Backend.makeMovie(myImagePath, myVideoPath, subdir!);
+      //           subdir = null;
+      //         }
+      //       }
+      //       int endTime = new DateTime.now().millisecondsSinceEpoch;
+      //       //print("Detection took ${endTime - startTime}");
+      //       isDetecting = false;
+      //     });
+      //   } else if (subdir != null && !widget.model) {
+      //     var directory;
+      //     if (Platform.isIOS) {
+      //       directory = await getApplicationDocumentsDirectory();
+      //     } else {
+      //       directory = await getExternalStorageDirectory();
+      //     }
 
-          final myImagePath = '${directory.path}/Shots/$subdir';
-          final myVideoPath = '${directory.path}/Shots';
-          Backend.makeMovie(myImagePath, myVideoPath, subdir!);
-          subdir = null;
-        }
-      });
+      //     final myImagePath = '${directory.path}/Shots/$subdir';
+      //     final myVideoPath = '${directory.path}/Shots';
+      //     Backend.makeMovie(myImagePath, myVideoPath, subdir!);
+      //     subdir = null;
+      //   }
+      // });
     }
   }
 
