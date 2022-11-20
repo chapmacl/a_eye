@@ -9,7 +9,6 @@ import 'package:ndialog/ndialog.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:sensors_plus/sensors_plus.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
-import 'package:tflite/tflite.dart';
 import 'package:wakelock/wakelock.dart';
 import 'dart:math' as math;
 import 'camera.dart';
@@ -66,12 +65,12 @@ class _CameraScreenState extends State<CameraScreen>
 
   loadModel() async {
     String? res;
-    Tflite.close();
-    res = await Tflite.loadModel(
-      model: "assets/models/lite1.tflite",
-      labels: "assets/models/ssd_mobilenet.txt",
-      //useGpuDelegate: true,
-    );
+    // Tflite.close();
+    // res = await Tflite.loadModel(
+    //   model: "assets/models/lite1.tflite",
+    //   labels: "assets/models/ssd_mobilenet.txt",
+    //   //useGpuDelegate: true,
+    // );
 
     print(res);
   }
