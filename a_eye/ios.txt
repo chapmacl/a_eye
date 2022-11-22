@@ -1,6 +1,3 @@
-permission handler: add permissions to podfile
-
 podfile for ffmpeg
 
-firebase/google login setup 
-
+Replace google sign in with apple
