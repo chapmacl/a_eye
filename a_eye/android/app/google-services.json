@@ -14,6 +14,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "809119698945-7i20ohfbrb7dfjv8um7nche6hjnk0qf0.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.chapmacl.a_eye",
+            "certificate_hash": "49cb1b038f849260c7d6527b306b6c0c52b86b65"
+          }
+        },
+        {
           "client_id": "809119698945-pegjnudhfhm1seb33ka0lstp9lsr36aa.apps.googleusercontent.com",
           "client_type": 3
         }
