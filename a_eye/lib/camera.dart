@@ -130,8 +130,8 @@ class _CameraState extends State<Camera> {
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
-              primary: AppTheme.notWhite, // background
-              onPrimary: AppTheme.appIndigo, // foreground
+              backgroundColor: AppTheme.notWhite, // background
+              foregroundColor: AppTheme.appIndigo, // foreground
             ),
             onPressed: () async {
               Permission.camera.status.then((value) => print(value));
