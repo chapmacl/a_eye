@@ -1,238 +1,184 @@
-import 'dart:io';
-
 import 'package:camera/camera.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:google_mlkit_commons/google_mlkit_commons.dart';
+import 'package:flutter/services.dart';
+import 'package:pytorch_lite/pigeon.dart';
+import 'package:pytorch_lite/pytorch_lite.dart';
 
-import '../main.dart';
+import 'camera_view_singleton.dart';
 
-enum ScreenMode { liveFeed, gallery }
-
+/// [CameraView] sends each frame for inference
 class CameraView extends StatefulWidget {
-  CameraView(
-      {Key? key,
-      required this.title,
-      required this.customPaint,
-      this.text,
-      required this.onImage,
-      this.onScreenModeChanged,
-      this.initialDirection = CameraLensDirection.back})
+  /// Callback to pass results after inference to [HomeView]
+  final Function(List<ResultObjectDetection?> recognitions) resultsCallback;
+  final Function(String classification) resultsCallbackClassification;
+
+  /// Constructor
+  const CameraView(this.resultsCallback, this.resultsCallbackClassification,
+      {Key? key})
       : super(key: key);
-
-  final String title;
-  final CustomPaint? customPaint;
-  final String? text;
-  final Function(InputImage inputImage) onImage;
-  final Function(ScreenMode mode)? onScreenModeChanged;
-  final CameraLensDirection initialDirection;
-
   @override
   _CameraViewState createState() => _CameraViewState();
 }
 
-class _CameraViewState extends State<CameraView> {
-  CameraController? _controller;
-  int _cameraIndex = 0;
-  double zoomLevel = 0.0, minZoomLevel = 0.0, maxZoomLevel = 0.0;
-  bool _changingCameraLens = false;
+class _CameraViewState extends State<CameraView> with WidgetsBindingObserver {
+  /// List of available cameras
+  late List<CameraDescription> cameras;
 
+  /// Controller
+  CameraController? cameraController;
+
+  /// true when inference is ongoing
+  bool predicting = false;
+
+  ModelObjectDetection? _objectModel;
+  ClassificationModel? _imageModel;
+
+  bool classification = false;
   @override
   void initState() {
     super.initState();
-
-    if (cameras.any(
-      (element) =>
-          element.lensDirection == widget.initialDirection &&
-          element.sensorOrientation == 90,
-    )) {
-      _cameraIndex = cameras.indexOf(
-        cameras.firstWhere((element) =>
-            element.lensDirection == widget.initialDirection &&
-            element.sensorOrientation == 90),
-      );
-    } else {
-      _cameraIndex = cameras.indexOf(
-        cameras.firstWhere(
-          (element) => element.lensDirection == widget.initialDirection,
-        ),
-      );
-    }
-
-    _startLiveFeed();
+    initStateAsync();
   }
 
-  @override
-  void dispose() {
-    _stopLiveFeed();
-    super.dispose();
+  //load your model
+  Future loadModel() async {
+    String pathImageModel = "assets/models/model_classification.pt";
+    //String pathCustomModel = "assets/models/custom_model.ptl";
+    String pathObjectDetectionModel = "assets/models/yolov5s.torchscript";
+    try {
+      _imageModel = await PytorchLite.loadClassificationModel(
+          pathImageModel, 224, 224,
+          labelPath: "assets/labels/label_classification_imageNet.txt");
+      //_customModel = await PytorchLite.loadCustomModel(pathCustomModel);
+      _objectModel = await PytorchLite.loadObjectDetectionModel(
+          pathObjectDetectionModel, 80, 640, 640,
+          labelPath: "assets/labels/labels_objectDetection_Coco.txt");
+    } catch (e) {
+      if (e is PlatformException) {
+        print("only supported for android, Error is $e");
+      } else {
+        print("Error is $e");
+      }
+    }
+  }
+
+  void initStateAsync() async {
+    WidgetsBinding.instance.addObserver(this);
+    await loadModel();
+
+    // Camera initialization
+    initializeCamera();
+
+    // Initially predicting = false
+    // predicting = false;
+  }
+
+  /// Initializes the camera by setting [cameraController]
+  void initializeCamera() async {
+    cameras = await availableCameras();
+
+    // cameras[0] for rear-camera
+    cameraController =
+        CameraController(cameras[0], ResolutionPreset.high, enableAudio: false);
+
+    cameraController?.initialize().then((_) async {
+      // Stream of image passed to [onLatestImageAvailable] callback
+      await cameraController?.startImageStream(onLatestImageAvailable);
+
+      /// previewSize is size of each image frame captured by controller
+      ///
+      /// 352x288 on iOS, 240p (320x240) on Android with ResolutionPreset.low
+      Size? previewSize = cameraController?.value.previewSize;
+
+      /// previewSize is size of raw input image to the model
+      CameraViewSingleton.inputImageSize = previewSize!;
+
+      // the display width of image on screen is
+      // same as screenWidth while maintaining the aspectRatio
+      Size screenSize = MediaQuery.of(context).size;
+      CameraViewSingleton.screenSize = screenSize;
+      CameraViewSingleton.ratio = screenSize.width / previewSize.height;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-        actions: [],
-      ),
-      body: _liveFeedBody(),
-      floatingActionButton: _floatingActionButton(),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-    );
-  }
-
-  Widget? _floatingActionButton() {
-    if (cameras.length == 1) return null;
-    return SizedBox(
-        height: 70.0,
-        width: 70.0,
-        child: FloatingActionButton(
-          child: Icon(
-            Platform.isIOS
-                ? Icons.flip_camera_ios_outlined
-                : Icons.flip_camera_android_outlined,
-            size: 40,
-          ),
-          onPressed: _switchLiveCamera,
-        ));
-  }
-
-  Widget _liveFeedBody() {
-    if (_controller?.value.isInitialized == false) {
+    // Return empty container while the camera is not initialized
+    if (cameraController == null || !cameraController!.value.isInitialized) {
       return Container();
     }
 
-    final size = MediaQuery.of(context).size;
-    // calculate scale depending on screen and camera ratios
-    // this is actually size.aspectRatio / (1 / camera.aspectRatio)
-    // because camera preview size is received as landscape
-    // but we're calculating for portrait orientation
-    var scale = size.aspectRatio * _controller!.value.aspectRatio;
+    return CameraPreview(cameraController!);
+    //return cameraController!.buildPreview();
 
-    // to prevent scaling down, invert the value
-    if (scale < 1) scale = 1 / scale;
-
-    return Container(
-      color: Colors.black,
-      child: Stack(
-        fit: StackFit.expand,
-        children: <Widget>[
-          Transform.scale(
-            scale: scale,
-            child: Center(
-              child: _changingCameraLens
-                  ? Center(
-                      child: const Text('Changing camera lens'),
-                    )
-                  : CameraPreview(_controller!),
-            ),
-          ),
-          if (widget.customPaint != null) widget.customPaint!,
-          Positioned(
-            bottom: 100,
-            left: 50,
-            right: 50,
-            child: Slider(
-              value: zoomLevel,
-              min: minZoomLevel,
-              max: maxZoomLevel,
-              onChanged: (newSliderValue) {
-                setState(() {
-                  zoomLevel = newSliderValue;
-                  _controller!.setZoomLevel(zoomLevel);
-                });
-              },
-              divisions: (maxZoomLevel - 1).toInt() < 1
-                  ? null
-                  : (maxZoomLevel - 1).toInt(),
-            ),
-          )
-        ],
-      ),
-    );
+    // return AspectRatio(
+    //     // aspectRatio: cameraController.value.aspectRatio,
+    //     child: CameraPreview(cameraController));
   }
 
-  Future _startLiveFeed() async {
-    final camera = cameras[_cameraIndex];
-    _controller = CameraController(
-      camera,
-      ResolutionPreset.high,
-      enableAudio: false,
-    );
-    _controller?.initialize().then((_) {
-      if (!mounted) {
-        return;
-      }
-      _controller?.getMinZoomLevel().then((value) {
-        zoomLevel = value;
-        minZoomLevel = value;
-      });
-      _controller?.getMaxZoomLevel().then((value) {
-        maxZoomLevel = value;
-      });
-      _controller?.startImageStream(_processCameraImage);
-      setState(() {});
-    }).catchError((error) {
-      // This usually happens when dispose finishes before this future. Ignore
-      print(error.toString());
-    });
-  }
+  runClassification(CameraImage cameraImage) async {
+    if (_imageModel != null) {
+      String imageClassifaction =
+          await _imageModel!.getImagePredictionFromBytesList(
+        cameraImage.planes.map((e) => e.bytes).toList(),
+        cameraImage.width,
+        cameraImage.height,
+      );
 
-  Future _stopLiveFeed() async {
-    if (_controller?.value.isInitialized == true)
-      await _controller?.stopImageStream();
-    await _controller?.dispose();
-    _controller = null;
-  }
-
-  Future _switchLiveCamera() async {
-    setState(() => _changingCameraLens = true);
-    _cameraIndex = (_cameraIndex + 1) % cameras.length;
-
-    await _stopLiveFeed();
-    await _startLiveFeed();
-    setState(() => _changingCameraLens = false);
-  }
-
-  Future _processCameraImage(CameraImage image) async {
-    final WriteBuffer allBytes = WriteBuffer();
-    for (final Plane plane in image.planes) {
-      allBytes.putUint8List(plane.bytes);
+      print("imageClassifaction $imageClassifaction");
+      widget.resultsCallbackClassification(imageClassifaction);
     }
-    final bytes = allBytes.done().buffer.asUint8List();
+  }
 
-    final Size imageSize =
-        Size(image.width.toDouble(), image.height.toDouble());
+  runObjectDetection(CameraImage cameraImage) async {
+    if (_objectModel != null) {
+      List<ResultObjectDetection?> objDetect = await _objectModel!
+          .getImagePredictionFromBytesList(
+              cameraImage.planes.map((e) => e.bytes).toList(),
+              cameraImage.width,
+              cameraImage.height,
+              minimumScore: 0.3,
+              iOUThreshold: 0.3);
 
-    final camera = cameras[_cameraIndex];
-    final imageRotation =
-        InputImageRotationValue.fromRawValue(camera.sensorOrientation);
-    if (imageRotation == null) return;
+      print("data outputted $objDetect");
+      widget.resultsCallback(objDetect);
+    }
+  }
 
-    final inputImageFormat =
-        InputImageFormatValue.fromRawValue(image.format.raw);
-    if (inputImageFormat == null) return;
+  /// Callback to receive each frame [CameraImage] perform inference on it
+  onLatestImageAvailable(CameraImage cameraImage) async {
+    if (predicting) {
+      return;
+    }
+    predicting = true;
 
-    final planeData = image.planes.map(
-      (Plane plane) {
-        return InputImagePlaneMetadata(
-          bytesPerRow: plane.bytesPerRow,
-          height: plane.height,
-          width: plane.width,
-        );
-      },
-    ).toList();
+    var futures = <Future>[];
+    futures.add(runClassification(cameraImage));
+    futures.add(runObjectDetection(cameraImage));
+    await Future.wait(futures);
 
-    final inputImageData = InputImageData(
-      size: imageSize,
-      imageRotation: imageRotation,
-      inputImageFormat: inputImageFormat,
-      planeData: planeData,
-    );
+    predicting = false;
+  }
 
-    final inputImage =
-        InputImage.fromBytes(bytes: bytes, inputImageData: inputImageData);
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) async {
+    switch (state) {
+      case AppLifecycleState.paused:
+        cameraController?.stopImageStream();
+        break;
+      case AppLifecycleState.resumed:
+        if (!cameraController!.value.isStreamingImages) {
+          await cameraController?.startImageStream(onLatestImageAvailable);
+        }
+        break;
+      default:
+    }
+  }
 
-    widget.onImage(inputImage);
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    cameraController?.dispose();
+    super.dispose();
   }
 }

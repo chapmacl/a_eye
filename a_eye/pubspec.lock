@@ -469,20 +469,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.0.5"
-  google_mlkit_commons:
-    dependency: transitive
-    description:
-      name: google_mlkit_commons
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "0.2.0"
-  google_mlkit_object_detection:
-    dependency: "direct main"
-    description:
-      name: google_mlkit_object_detection
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "0.6.0"
   google_sign_in:
     dependency: "direct main"
     description:
@@ -756,6 +742,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "6.0.4"
+  pytorch_lite:
+    dependency: "direct main"
+    description:
+      name: pytorch_lite
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.0.5"
   quiver:
     dependency: transitive
     description:

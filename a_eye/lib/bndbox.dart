@@ -1,84 +1,75 @@
-import 'package:a_eye/app_theme.dart';
 import 'package:flutter/material.dart';
-import 'dart:math' as math;
+import 'package:pytorch_lite/pigeon.dart';
 
-class BndBox extends StatelessWidget {
-  final List<dynamic>? results;
-  final int previewH;
-  final int previewW;
-  final double screenH;
-  final double screenW;
-  final bool bbox;
-  final bool labels;
+import 'camera_view_singleton.dart';
 
-  BndBox(this.results, this.previewH, this.previewW, this.screenH, this.screenW,
-      this.bbox, this.labels);
-
+/// Individual bounding box
+class BoxWidget extends StatelessWidget {
+  ResultObjectDetection result;
+  Color? boxesColor;
+  bool showPercentage;
+  BoxWidget(
+      {Key? key,
+      required this.result,
+      this.boxesColor,
+      this.showPercentage = true})
+      : super(key: key);
   @override
   Widget build(BuildContext context) {
-    List<Widget> _renderBox() {
-      return results!.map((re) {
-        var _x = re["rect"]["x"];
-        var _w = re["rect"]["w"];
-        var _y = re["rect"]["y"];
-        var _h = re["rect"]["h"];
-        var scaleW, scaleH, x, y, w, h;
+    // Color for bounding box
+    //print(MediaQuery.of(context).size);
+    Color? usedColor;
+    //Size screenSize = CameraViewSingleton.inputImageSize;
+    Size screenSize = CameraViewSingleton.actualPreviewSizeH;
+    //Size screenSize = MediaQuery.of(context).size;
 
-        if (screenH / screenW > previewH / previewW) {
-          scaleW = screenH / previewH * previewW;
-          scaleH = screenH;
-          var difW = (scaleW - screenW) / scaleW;
-          x = (_x - difW / 2) * scaleW;
-          w = _w * scaleW;
-          if (_x < difW / 2) w -= (difW / 2 - _x) * scaleW;
-          y = _y * scaleH;
-          h = _h * scaleH;
-        } else {
-          scaleH = screenW / previewW * previewH;
-          scaleW = screenW;
-          var difH = (scaleH - screenH) / scaleH;
-          x = _x * scaleW;
-          w = _w * scaleW;
-          y = (_y - difH / 2) * scaleH;
-          h = _h * scaleH;
-          if (_y < difH / 2) h -= (difH / 2 - _y) * scaleH;
-        }
+    //print(screenSize);
+    double factorX = screenSize.width;
+    double factorY = screenSize.height;
+    if (boxesColor == null) {
+      //change colors for each label
+      usedColor = Colors.primaries[
+          ((result.className ?? result.classIndex.toString()).length +
+                  (result.className ?? result.classIndex.toString())
+                      .codeUnitAt(0) +
+                  result.classIndex) %
+              Colors.primaries.length];
+    } else {
+      usedColor = boxesColor;
+    }
+    return Positioned(
+      left: result.rect.left * factorX,
+      top: result.rect.top * factorY - 20,
+      //width: re.rect.width.toDouble(),
+      //height: re.rect.height.toDouble(),
 
-        return Positioned(
-          left: math.max(0, x),
-          top: math.max(0, y),
-          width: w,
-          height: h,
-          child: Container(
-            decoration: bbox
-                ? BoxDecoration(
-                    border: Border.all(
-                      color: AppTheme.appGreen,
-                      width: 2.0,
-                    ),
-                  )
-                : null,
-            child: Align(
-              alignment: Alignment.bottomLeft,
-              child: labels
-                  ? Text(
-                      "${re["detectedClass"]} ${(re["confidenceInClass"] * 100).toStringAsFixed(0)}%",
-                      style: TextStyle(
-                          backgroundColor: AppTheme.appGreen,
-                          color: Colors.white,
-                          fontSize: 14.0,
-                          fontWeight: FontWeight.bold,
-                          fontFamily: 'Monsterrat'),
-                    )
-                  : SizedBox(),
+      //left: re?.rect.left.toDouble(),
+      //top: re?.rect.top.toDouble(),
+      //right: re.rect.right.toDouble(),
+      //bottom: re.rect.bottom.toDouble(),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            height: 20,
+            alignment: Alignment.centerRight,
+            color: usedColor,
+            child: Text(
+              "${result.className ?? result.classIndex.toString()}_${showPercentage ? "${(result.score * 100).toStringAsFixed(2)}%" : ""}",
             ),
           ),
-        );
-      }).toList();
-    }
-
-    return Stack(
-      children: _renderBox(),
+          Container(
+            width: result.rect.width.toDouble() * factorX,
+            height: result.rect.height.toDouble() * factorY,
+            decoration: BoxDecoration(
+                border: Border.all(color: usedColor!, width: 3),
+                borderRadius: const BorderRadius.all(Radius.circular(2))),
+            child: Container(),
+          ),
+        ],
+      ),
     );
   }
 }
