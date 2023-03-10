@@ -289,15 +289,15 @@ class _CameraScreenState extends State<CameraScreen>
           children: [
             Camera(widget.cameras, setRecognitions, _model, bbox, labels,
                 blackout, zoom, isDetecting, getRotation()),
-            if (!blackout)
-              BndBox(
-                  _recognitions == null ? [] : _recognitions,
-                  math.max(_imageHeight, _imageWidth),
-                  math.min(_imageHeight, _imageWidth),
-                  screen.height,
-                  screen.width,
-                  bbox,
-                  labels),
+            // if (!blackout)
+            //   BndBox(
+            //       _recognitions == null ? [] : _recognitions,
+            //       math.max(_imageHeight, _imageWidth),
+            //       math.min(_imageHeight, _imageWidth),
+            //       screen.height,
+            //       screen.width,
+            //       bbox,
+            //       labels),
           ],
         ),
       ),

@@ -1,149 +1,152 @@
-import 'dart:io' as io;
-
-import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:google_mlkit_object_detection/google_mlkit_object_detection.dart';
-import 'package:path/path.dart';
-import 'package:path_provider/path_provider.dart';
+import 'package:pytorch_lite/pigeon.dart';
+import 'bndbox.dart';
 
 import 'camera_view.dart';
-import 'object_detector_painter.dart';
 
 class ObjectDetectorView extends StatefulWidget {
+  const ObjectDetectorView({Key? key}) : super(key: key);
+
   @override
-  _ObjectDetectorView createState() => _ObjectDetectorView();
+  _ObjectDetectorViewState createState() => _ObjectDetectorViewState();
 }
 
-class _ObjectDetectorView extends State<ObjectDetectorView> {
-  late ObjectDetector _objectDetector;
-  bool _canProcess = false;
-  bool _isBusy = false;
-  CustomPaint? _customPaint;
-  String? _text;
+class _ObjectDetectorViewState extends State<ObjectDetectorView> {
+  List<ResultObjectDetection?>? results;
+  String? classification;
 
-  @override
-  void initState() {
-    super.initState();
-
-    _initializeDetector(DetectionMode.stream);
-  }
-
-  @override
-  void dispose() {
-    _canProcess = false;
-    _objectDetector.close();
-    super.dispose();
-  }
+  /// Scaffold Key
+  GlobalKey<ScaffoldState> scaffoldKey = GlobalKey();
 
   @override
   Widget build(BuildContext context) {
-    return CameraView(
-      title: 'Object Detector',
-      customPaint: _customPaint,
-      text: _text,
-      onImage: (inputImage) {
-        processImage(inputImage);
-      },
-      onScreenModeChanged: _onScreenModeChanged,
-      initialDirection: CameraLensDirection.back,
+    return Scaffold(
+      key: scaffoldKey,
+      backgroundColor: Colors.black,
+      body: Stack(
+        children: <Widget>[
+          // Camera View
+          CameraView(resultsCallback, resultsCallbackClassification),
+
+          // Bounding boxes
+          boundingBoxes2(results),
+
+          // Heading
+          // Align(
+          //   alignment: Alignment.topLeft,
+          //   child: Container(
+          //     padding: EdgeInsets.only(top: 20),
+          //     child: Text(
+          //       'Object Detection Flutter',
+          //       textAlign: TextAlign.left,
+          //       style: TextStyle(
+          //         fontSize: 28,
+          //         fontWeight: FontWeight.bold,
+          //         color: Colors.deepOrangeAccent.withOpacity(0.6),
+          //       ),
+          //     ),
+          //   ),
+          // ),
+
+          //Bottom Sheet
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: DraggableScrollableSheet(
+              initialChildSize: 0.4,
+              minChildSize: 0.1,
+              maxChildSize: 0.5,
+              builder: (_, ScrollController scrollController) => Container(
+                width: double.maxFinite,
+                decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.9),
+                    borderRadius: const BorderRadius.only(
+                        topLeft: Radius.circular(24.0),
+                        topRight: Radius.circular(24.0))),
+                child: SingleChildScrollView(
+                  controller: scrollController,
+                  child: Center(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.keyboard_arrow_up,
+                            size: 48, color: Colors.orange),
+                        (classification != null)
+                            ? Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Column(
+                                  children: [
+                                    StatsRow(
+                                        'Classification:', '$classification'),
+                                  ],
+                                ),
+                              )
+                            : Container()
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          )
+        ],
+      ),
     );
   }
 
-  void _onScreenModeChanged(ScreenMode mode) {
-    switch (mode) {
-      case ScreenMode.gallery:
-        _initializeDetector(DetectionMode.single);
-        return;
-
-      case ScreenMode.liveFeed:
-        _initializeDetector(DetectionMode.stream);
-        return;
+  /// Returns Stack of bounding boxes
+  Widget boundingBoxes2(List<ResultObjectDetection?>? results) {
+    if (results == null) {
+      return Container();
     }
-  }
-
-  void _initializeDetector(DetectionMode mode) async {
-    print('Set detector in mode: $mode');
-
-    // uncomment next lines if you want to use the default model
-    // final options = ObjectDetectorOptions(
-    //     mode: mode,
-    //     classifyObjects: true,
-    //     multipleObjects: true);
-    // _objectDetector = ObjectDetector(options: options);
-
-    // uncomment next lines if you want to use a local model
-    // make sure to add tflite model to assets/ml
-    final path = 'assets/models/mobilenet.tflite';
-    final modelPath = await _getModel(path);
-    final options = LocalObjectDetectorOptions(
-      mode: mode,
-      modelPath: modelPath,
-      classifyObjects: true,
-      multipleObjects: true,
+    return Stack(
+      children: results.map((e) => BoxWidget(result: e!)).toList(),
     );
-    _objectDetector = ObjectDetector(options: options);
-
-    // uncomment next lines if you want to use a remote model
-    // make sure to add model to firebase
-    // final modelName = 'bird-classifier';
-    // final response =
-    //     await FirebaseObjectDetectorModelManager().downloadModel(modelName);
-    // print('Downloaded: $response');
-    // final options = FirebaseObjectDetectorOptions(
-    //   mode: mode,
-    //   modelName: modelName,
-    //   classifyObjects: true,
-    //   multipleObjects: true,
-    // );
-    // _objectDetector = ObjectDetector(options: options);
-
-    _canProcess = true;
   }
 
-  Future<void> processImage(InputImage inputImage) async {
-    if (!_canProcess) return;
-    if (_isBusy) return;
-    _isBusy = true;
+  void resultsCallback(List<ResultObjectDetection?> results) {
     setState(() {
-      _text = '';
-    });
-    final objects = await _objectDetector.processImage(inputImage);
-    if (inputImage.inputImageData?.size != null &&
-        inputImage.inputImageData?.imageRotation != null) {
-      final painter = ObjectDetectorPainter(
-          objects,
-          inputImage.inputImageData!.imageRotation,
-          inputImage.inputImageData!.size);
-      _customPaint = CustomPaint(painter: painter);
-    } else {
-      String text = 'Objects found: ${objects.length}\n\n';
-      for (final object in objects) {
-        text +=
-            'Object:  trackingId: ${object.trackingId} - ${object.labels.map((e) => e.text)}\n\n';
+      this.results = results;
+      for (var element in results) {
+        print({
+          "rect": {
+            "left": element?.rect.left,
+            "top": element?.rect.top,
+            "width": element?.rect.width,
+            "height": element?.rect.height,
+            "right": element?.rect.right,
+            "bottom": element?.rect.bottom,
+          },
+        });
       }
-      _text = text;
-      // TODO: set _customPaint to draw boundingRect on top of image
-      _customPaint = null;
-    }
-    _isBusy = false;
-    if (mounted) {
-      setState(() {});
-    }
+    });
   }
 
-  Future<String> _getModel(String assetPath) async {
-    if (io.Platform.isAndroid) {
-      return 'flutter_assets/$assetPath';
-    }
-    final path = '${(await getApplicationSupportDirectory()).path}/$assetPath';
-    await io.Directory(dirname(path)).create(recursive: true);
-    final file = io.File(path);
-    if (!await file.exists()) {
-      final byteData = await rootBundle.load(assetPath);
-      await file.writeAsBytes(byteData.buffer
-          .asUint8List(byteData.offsetInBytes, byteData.lengthInBytes));
-    }
-    return file.path;
+  void resultsCallbackClassification(String classification) {
+    setState(() {
+      this.classification = classification;
+    });
+  }
+
+  // static const BOTTOM_SHEET_RADIUS = Radius.circular(24.0);
+  // static const BORDER_RADIUS_BOTTOM_SHEET = BorderRadius.only(
+  //     topLeft: BOTTOM_SHEET_RADIUS, topRight: BOTTOM_SHEET_RADIUS);
+}
+
+/// Row for one Stats field
+class StatsRow extends StatelessWidget {
+  final String left;
+  final String right;
+
+  const StatsRow(this.left, this.right, {Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [Text(left), Text(right)],
+      ),
+    );
   }
 }
