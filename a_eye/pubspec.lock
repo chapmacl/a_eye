@@ -405,6 +405,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "3.3.0"
+  flutter_d2go:
+    dependency: "direct main"
+    description:
+      name: flutter_d2go
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.6.1"
   flutter_launcher_icons:
     dependency: "direct dev"
     description:
@@ -742,13 +749,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "6.0.4"
-  pytorch_lite:
-    dependency: "direct main"
-    description:
-      name: pytorch_lite
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "2.0.5"
   quiver:
     dependency: transitive
     description:
