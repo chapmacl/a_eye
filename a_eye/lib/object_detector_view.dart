@@ -48,46 +48,46 @@ class _ObjectDetectorViewState extends State<ObjectDetectorView> {
           //   ),
           // ),
 
-          //Bottom Sheet
-          Align(
-            alignment: Alignment.bottomCenter,
-            child: DraggableScrollableSheet(
-              initialChildSize: 0.4,
-              minChildSize: 0.1,
-              maxChildSize: 0.5,
-              builder: (_, ScrollController scrollController) => Container(
-                width: double.maxFinite,
-                decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.9),
-                    borderRadius: const BorderRadius.only(
-                        topLeft: Radius.circular(24.0),
-                        topRight: Radius.circular(24.0))),
-                child: SingleChildScrollView(
-                  controller: scrollController,
-                  child: Center(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Icon(Icons.keyboard_arrow_up,
-                            size: 48, color: Colors.orange),
-                        (classification != null)
-                            ? Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Column(
-                                  children: [
-                                    StatsRow(
-                                        'Classification:', '$classification'),
-                                  ],
-                                ),
-                              )
-                            : Container()
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          )
+          // //Bottom Sheet
+          // Align(
+          //   alignment: Alignment.bottomCenter,
+          //   child: DraggableScrollableSheet(
+          //     initialChildSize: 0.4,
+          //     minChildSize: 0.1,
+          //     maxChildSize: 0.5,
+          //     builder: (_, ScrollController scrollController) => Container(
+          //       width: double.maxFinite,
+          //       decoration: BoxDecoration(
+          //           color: Colors.white.withOpacity(0.9),
+          //           borderRadius: const BorderRadius.only(
+          //               topLeft: Radius.circular(24.0),
+          //               topRight: Radius.circular(24.0))),
+          //       child: SingleChildScrollView(
+          //         controller: scrollController,
+          //         child: Center(
+          //           child: Column(
+          //             mainAxisSize: MainAxisSize.min,
+          //             children: [
+          //               const Icon(Icons.keyboard_arrow_up,
+          //                   size: 48, color: Colors.orange),
+          //               (classification != null)
+          //                   ? Padding(
+          //                       padding: const EdgeInsets.all(8.0),
+          //                       child: Column(
+          //                         children: [
+          //                           StatsRow(
+          //                               'Classification:', '$classification'),
+          //                         ],
+          //                       ),
+          //                     )
+          //                   : Container()
+          //             ],
+          //           ),
+          //         ),
+          //       ),
+          //     ),
+          //   ),
+          // )
         ],
       ),
     );

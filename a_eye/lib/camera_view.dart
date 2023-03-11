@@ -31,7 +31,6 @@ class _CameraViewState extends State<CameraView> with WidgetsBindingObserver {
   bool predicting = false;
 
   ModelObjectDetection? _objectModel;
-  ClassificationModel? _imageModel;
 
   bool classification = false;
   @override
@@ -42,17 +41,11 @@ class _CameraViewState extends State<CameraView> with WidgetsBindingObserver {
 
   //load your model
   Future loadModel() async {
-    String pathImageModel = "assets/models/model_classification.pt";
-    //String pathCustomModel = "assets/models/custom_model.ptl";
-    String pathObjectDetectionModel = "assets/models/yolov5s.torchscript";
+    String pathObjectDetectionModel = "assets/models/yolov5n.torchscript";
     try {
-      _imageModel = await PytorchLite.loadClassificationModel(
-          pathImageModel, 224, 224,
-          labelPath: "assets/labels/label_classification_imageNet.txt");
-      //_customModel = await PytorchLite.loadCustomModel(pathCustomModel);
       _objectModel = await PytorchLite.loadObjectDetectionModel(
           pathObjectDetectionModel, 80, 640, 640,
-          labelPath: "assets/labels/labels_objectDetection_Coco.txt");
+          labelPath: "assets/models/labels.txt");
     } catch (e) {
       if (e is PlatformException) {
         print("only supported for android, Error is $e");
@@ -116,20 +109,6 @@ class _CameraViewState extends State<CameraView> with WidgetsBindingObserver {
     //     child: CameraPreview(cameraController));
   }
 
-  runClassification(CameraImage cameraImage) async {
-    if (_imageModel != null) {
-      String imageClassifaction =
-          await _imageModel!.getImagePredictionFromBytesList(
-        cameraImage.planes.map((e) => e.bytes).toList(),
-        cameraImage.width,
-        cameraImage.height,
-      );
-
-      print("imageClassifaction $imageClassifaction");
-      widget.resultsCallbackClassification(imageClassifaction);
-    }
-  }
-
   runObjectDetection(CameraImage cameraImage) async {
     if (_objectModel != null) {
       List<ResultObjectDetection?> objDetect = await _objectModel!
@@ -152,10 +131,7 @@ class _CameraViewState extends State<CameraView> with WidgetsBindingObserver {
     }
     predicting = true;
 
-    var futures = <Future>[];
-    futures.add(runClassification(cameraImage));
-    futures.add(runObjectDetection(cameraImage));
-    await Future.wait(futures);
+    await runObjectDetection(cameraImage);
 
     predicting = false;
   }
