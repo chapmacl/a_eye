@@ -1,23 +1,22 @@
-import 'package:a_eye/app_theme.dart';
-import 'package:a_eye/backend.dart';
-import 'package:a_eye/object_detector_view.dart';
-import 'package:a_eye/settings_screen.dart';
+import 'package:a_eye/utils/app_theme.dart';
+import 'package:a_eye/providers/firebase.dart';
+import 'package:a_eye/screens/object_detector_view.dart';
 import 'package:bottom_navy_bar/bottom_navy_bar.dart';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
-import 'package:a_eye/file_explorer.dart';
+import 'package:a_eye/screens/file_explorer.dart';
+import 'package:a_eye/screens/settings_screen.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_settings_screens/flutter_settings_screens.dart';
 import 'package:ndialog/ndialog.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'camera_screen.dart';
 
 late List<CameraDescription> cameras;
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Settings.init();
-  await Backend.initializeFirebase();
+  await Firebase_backend.initializeFirebase();
   try {
     cameras = await availableCameras();
   } on CameraException catch (e) {

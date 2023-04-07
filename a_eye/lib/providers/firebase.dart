@@ -1,5 +1,5 @@
 import 'dart:io';
-import 'package:a_eye/app_theme.dart';
+import 'package:a_eye/utils/app_theme.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:path/path.dart' as path;
 import 'package:firebase_auth/firebase_auth.dart';
@@ -14,7 +14,7 @@ import 'package:flutter_settings_screens/flutter_settings_screens.dart'
     as settings;
 import 'package:ffmpeg_kit_flutter/ffmpeg_kit.dart';
 
-class Backend {
+class Firebase_backend {
   static FirebaseAuth auth = FirebaseAuth.instance;
   static FirebaseStorage storage = FirebaseStorage.instance;
   static FirebaseFirestore firestore = FirebaseFirestore.instance;

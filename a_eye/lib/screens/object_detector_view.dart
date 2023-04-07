@@ -1,8 +1,7 @@
+import 'package:a_eye/screens/camera_view.dart';
 import 'package:flutter/material.dart';
 import 'package:pytorch_lite/pigeon.dart';
-import 'bndbox.dart';
-
-import 'camera_view.dart';
+import '../widgets/bndbox.dart';
 
 class ObjectDetectorView extends StatefulWidget {
   const ObjectDetectorView({Key? key}) : super(key: key);

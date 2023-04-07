@@ -1,8 +1,8 @@
 import 'dart:io';
-import 'package:a_eye/app_theme.dart';
-import 'package:a_eye/backend.dart';
-import 'package:a_eye/video_view.dart';
-import 'package:a_eye/string_functions.dart';
+import 'package:a_eye/utils/app_theme.dart';
+import 'package:a_eye/providers/firebase.dart';
+import 'package:a_eye/screens/video_view.dart';
+import 'package:a_eye/utils/string_functions.dart';
 import 'package:back_button_interceptor/back_button_interceptor.dart';
 import 'package:draggable_scrollbar/draggable_scrollbar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -284,7 +284,7 @@ class _FileScreenState extends State<FileScreen> {
       await dir.delete(recursive: true);
       isLocal = null;
     } else {
-      await Backend.deleteFile(path);
+      await Firebase_backend.deleteFile(path);
     }
 
     updateDir(subdirs.last);
@@ -402,7 +402,7 @@ class _FileScreenState extends State<FileScreen> {
                                         textColor: AppTheme.appIndigo,
                                         fontSize: 16.0);
                                   }
-                                  await Backend.uploadFiles(
+                                  await Firebase_backend.uploadFiles(
                                       videoPaths, folderName);
                                 }),
                           FocusedMenuItem(
@@ -586,7 +586,7 @@ class _FileScreenState extends State<FileScreen> {
               ),
               child: InkWell(
                 onTap: () async => {
-                  user = Backend.getUser(),
+                  user = Firebase_backend.getUser(),
                   if (user == null)
                     {
                       DialogBackground(
@@ -650,9 +650,9 @@ class _FileScreenState extends State<FileScreen> {
   Future getCloudData(String dir) async {
     var resultMap;
     if (dir == 'cloud') {
-      resultMap = await Backend.getFolders();
+      resultMap = await Firebase_backend.getFolders();
     } else {
-      resultMap = await Backend.getFiles(dir);
+      resultMap = await Firebase_backend.getFiles(dir);
     }
     return resultMap;
   }

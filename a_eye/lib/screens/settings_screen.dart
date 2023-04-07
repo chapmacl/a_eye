@@ -1,9 +1,9 @@
 import 'dart:convert';
 
-import 'package:a_eye/app_theme.dart';
-import 'package:a_eye/backend.dart';
-import 'package:a_eye/label_map.dart';
-import 'package:a_eye/maps_screen.dart';
+import 'package:a_eye/providers/firebase.dart';
+import 'package:a_eye/utils/app_theme.dart';
+import 'package:a_eye/utils/label_map.dart';
+import 'package:a_eye/screens/maps_screen.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -32,7 +32,7 @@ class _SettingsAreaState extends State<SettingsArea> {
 
   @override
   Widget build(BuildContext context) {
-    User? user = Backend.getUser();
+    User? user = Firebase_backend.getUser();
     bool result = false;
     return Scaffold(
       appBar: AppBar(
@@ -95,7 +95,7 @@ class _SettingsAreaState extends State<SettingsArea> {
                         ))),
                     onPressed: () async {
                       user == null
-                          ? await Backend.signInWithGoogle()
+                          ? await Firebase_backend.signInWithGoogle()
                           : result = await DialogBackground(
                               blur: 2.0,
                               dialog: AlertDialog(
@@ -118,12 +118,12 @@ class _SettingsAreaState extends State<SettingsArea> {
                             ).show(context,
                               transitionType: DialogTransitionType.Bubble);
                       if (result) {
-                        await Backend.signOut();
+                        await Firebase_backend.signOut();
 
                         result = false;
                       }
                       setState(() {
-                        user = Backend.getUser();
+                        user = Firebase_backend.getUser();
                       });
                     }),
               ),
