@@ -313,7 +313,6 @@ class _CameraState extends State<Camera> {
     }
   }
 
-  // something is causing this to massively hang in flutter 2.8.0
   convertImg(CameraImage img, recognitions) async {
     if (startCapture) {
       // At the beginning of a new capture session, all variables are initialized
