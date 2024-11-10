@@ -6,23 +6,9 @@
     "configurations": [
         {
             "name": "a_eye",
-            "cwd": "a_eye",
-            "request": "launch",
-            "type": "dart"
-        },
-        {
-            "name": "a_eye (profile mode)",
-            "cwd": "a_eye",
             "request": "launch",
             "type": "dart",
-            "flutterMode": "profile"
-        },
-        {
-            "name": "a_eye (release mode)",
-            "cwd": "a_eye",
-            "request": "launch",
-            "type": "dart",
-            "flutterMode": "release"
+            "flutterMode": "debug"
         }
     ]
 }
