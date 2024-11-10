@@ -16,3 +16,31 @@ A_Eye is a Peronal Project Flutter app that turns a smartphone into an intellige
    - Download google-services.json and add it to android/app/.
    - Download GoogleService-Info.plist and add it to ios/Runner/.
 5. An object detection model must be in the project. For ease of use, I recommend the official model files from Google on Tensorhub, since they work well with a Flutter Library. 
+
+
+### Project Structure 
+
+For those less familiar with Flutter projects, the basic file structure is arranged like this
+```
+a_eye/
+├── android/                    # Android-specific code and configurations
+├── assets/                     # Static assets like images, models
+├── ios/                        # iOS-specific code and configurations
+├── lib/                        # Main application code for Flutter
+│   ├── main.dart               # Entry point of the application
+│   ├── providers/              # State management and data providers
+│   ├── screens/                # UI screens and navigation flows
+│   ├── utils/                  # Utility functions and helper classes
+│   └── widgets/                # Reusable UI components
+├── test/                       # Unit and widget tests
+└── pubspec.yaml                # Dependency and asset configuration
+```
+
+### Folder Overview
+
+- *lib/providers/*: Contains provider class objects for managing app state, in this case our Firebase backend.
+- *lib/screens/*: Houses each screen of the app, through which users navigate (e.g., login, settings, main detection view).
+- *lib/utils/*: Utility functions and helpers for tasks such as object detection pipeline and data processing.
+- *lib/widgets/*: Reusable components for a consistent UI across the app.
+
+This structure supports a clean separation of concerns, helping make A_Eye easy to extend and maintain. When designing a project, it is useful to separate code into files based on what the code does. It should be as granular as possible, and then organized in a way that groups files based on their general purpose or function. 
